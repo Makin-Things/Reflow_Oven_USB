@@ -142,77 +142,124 @@
   <documentation help="" />
   <dependencies>
     <content-extension eid="0e160d5c-e331-48d9-850b-e0387912171b" uuidref="0e160d5c-e331-48d9-850b-e0387912171b" version="13.03.03" />
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.7.2" />
   </dependencies>
 </framework-data>
     </AsfFrameworkConfig>
+    <SccProjectName>Svn</SccProjectName>
+    <SccProvider>SubversionScc</SccProvider>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccLocalPath>Svn</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols><ListValues>
-  <Value>F_CPU=8000000</Value>
-  <Value>USE_LUFA_CONFIG_HEADER</Value>
-  <Value>F_USB=8000000</Value>
-  <Value>ARCH=ARCH_AVR8</Value>
-  <Value>USB_DEVICE_ONLY</Value>
-  <Value>FIXED_CONTROL_ENDPOINT_SIZE=8</Value>
-  <Value>FIXED_NUM_CONFIGURATIONS=1</Value>
-  <Value>USE_FLASH_DESCRIPTORS</Value>
-  <Value>USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"</Value>
-  <Value>NDEBUG</Value>
-</ListValues></avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.directories.IncludePaths><ListValues><Value>../src/Config</Value><Value>../src/LUFA/.</Value></ListValues></avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries><ListValues><Value>libm</Value></ListValues></avrgcc.linker.libraries.Libraries>
-  <avrgcc.linker.memorysettings.Eeprom><ListValues><Value>.validapp=0x01FF</Value><Value>.eeprom=0x0000</Value></ListValues></avrgcc.linker.memorysettings.Eeprom>
-  <avrgcc.assembler.general.IncludePaths><ListValues><Value>../src/Config</Value><Value>../src/LUFA/.</Value></ListValues></avrgcc.assembler.general.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=8000000</Value>
+            <Value>USE_LUFA_CONFIG_HEADER</Value>
+            <Value>F_USB=8000000</Value>
+            <Value>ARCH=ARCH_AVR8</Value>
+            <Value>USB_DEVICE_ONLY</Value>
+            <Value>FIXED_CONTROL_ENDPOINT_SIZE=8</Value>
+            <Value>FIXED_NUM_CONFIGURATIONS=1</Value>
+            <Value>USE_FLASH_DESCRIPTORS</Value>
+            <Value>USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"</Value>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/Config</Value>
+            <Value>../src/LUFA/.</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.memorysettings.Eeprom>
+          <ListValues>
+            <Value>.validapp=0x01FF</Value>
+            <Value>.eeprom=0x0000</Value>
+          </ListValues>
+        </avrgcc.linker.memorysettings.Eeprom>
+        <avrgcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/Config</Value>
+            <Value>../src/LUFA/.</Value>
+          </ListValues>
+        </avrgcc.assembler.general.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+      </AvrGcc>
     </ToolchainSettings>
-    <PostBuildEvent>"D:\Develop\AES Bootloader Tools\Release\create.exe" -c ..\$(Name).txt -f $(Name).hex -e $(Name).eep -v ..\Revision.txt -o $(Name).enc</PostBuildEvent>
+    <PostBuildEvent>"D:\Develop\AES Bootloader Tools\Release\create.exe" -c "..\$(Name).txt" -f "$(Name).hex" -e "$(Name).eep" -v ..\Revision.txt -o "$(Name).enc"</PostBuildEvent>
     <PreBuildEvent>"c:\Program Files\TortoiseSVN\bin\SubWCRev.exe" .. ..\Version.tpl ..\Version.h
 "c:\Program Files\TortoiseSVN\bin\SubWCRev.exe" .. ..\Revision.tpl ..\Revision.txt</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols><ListValues>
-  <Value>F_CPU=8000000</Value>
-  <Value>USE_LUFA_CONFIG_HEADER</Value>
-  <Value>F_USB=8000000</Value>
-  <Value>ARCH=ARCH_AVR8</Value>
-  <Value>USB_DEVICE_ONLY</Value>
-  <Value>FIXED_CONTROL_ENDPOINT_SIZE=8</Value>
-  <Value>FIXED_NUM_CONFIGURATIONS=1</Value>
-  <Value>USE_FLASH_DESCRIPTORS</Value>
-  <Value>USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"</Value>
-  <Value>DEBUG</Value>
-</ListValues></avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.directories.IncludePaths><ListValues><Value>../src/Config</Value><Value>../src/LUFA/.</Value></ListValues></avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries><ListValues><Value>libm</Value></ListValues></avrgcc.linker.libraries.Libraries>
-  <avrgcc.linker.memorysettings.Eeprom><ListValues><Value>.validapp=0x01FF</Value><Value>.eeprom=0x0000</Value></ListValues></avrgcc.linker.memorysettings.Eeprom>
-  <avrgcc.assembler.general.IncludePaths><ListValues><Value>../src/Config</Value><Value>../src/LUFA/.</Value></ListValues></avrgcc.assembler.general.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=8000000</Value>
+            <Value>USE_LUFA_CONFIG_HEADER</Value>
+            <Value>F_USB=8000000</Value>
+            <Value>ARCH=ARCH_AVR8</Value>
+            <Value>USB_DEVICE_ONLY</Value>
+            <Value>FIXED_CONTROL_ENDPOINT_SIZE=8</Value>
+            <Value>FIXED_NUM_CONFIGURATIONS=1</Value>
+            <Value>USE_FLASH_DESCRIPTORS</Value>
+            <Value>USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"</Value>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/Config</Value>
+            <Value>../src/LUFA/.</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.memorysettings.Eeprom>
+          <ListValues>
+            <Value>.validapp=0x01FF</Value>
+            <Value>.eeprom=0x0000</Value>
+          </ListValues>
+        </avrgcc.linker.memorysettings.Eeprom>
+        <avrgcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/Config</Value>
+            <Value>../src/LUFA/.</Value>
+          </ListValues>
+        </avrgcc.assembler.general.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
@@ -234,7 +281,7 @@
     <None Include="Reflow Oven USB.inf">
       <SubType>compile</SubType>
     </None>
-    <None Include="ReflowOven.txt">
+    <None Include="Reflow Oven USB.txt">
       <SubType>compile</SubType>
     </None>
     <None Include="Revision.tpl">
