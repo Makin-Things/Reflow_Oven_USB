@@ -140,9 +140,10 @@
     <file path="src/LUFA/LUFA/Platform/Platform.h" framework="" version="13.03.03" source="LUFA\Platform\Platform.h" changed="False" content-id="0e160d5c-e331-48d9-850b-e0387912171b" />
   </files>
   <documentation help="" />
+  <offline-documentation help="" />
   <dependencies>
     <content-extension eid="0e160d5c-e331-48d9-850b-e0387912171b" uuidref="0e160d5c-e331-48d9-850b-e0387912171b" version="13.03.03" />
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.7.2" />
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.6.0" />
   </dependencies>
 </framework-data>
     </AsfFrameworkConfig>
