@@ -78,8 +78,6 @@ extern uint8_t CurrentMenuItemIdx;
 //==============================================================================================================================
 // Defines
 
-#define BUILD(x) #x
-
 #define OVEN_RELAY_SSR		PB4
 #define OVEN_RELAY_EMR		PB5
 
@@ -1146,7 +1144,7 @@ int main(void)
 	if (lcdPresent)
 	{
 	  lcd_clrscr (); // clear display and home cursor
-		lcd_puts_p (PSTR ("Reflow USB v2."BUILD(build)));
+		lcd_puts_p (PSTR ("Reflow Oven USB\nv2."buildstr));
 	}
 
 	for (;;)
