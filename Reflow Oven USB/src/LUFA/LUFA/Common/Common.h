@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -112,7 +112,7 @@
 			#include <math.h>
 
 			// === TODO: Find abstracted way to handle these ===
-			#define PROGMEM                  
+			#define PROGMEM
 			#define pgm_read_byte(x)         *x
 			#define memcmp_P(...)            memcmp(__VA_ARGS__)
 			#define memcpy_P(...)            memcpy(__VA_ARGS__)
@@ -178,8 +178,8 @@
 			 *  \attention This macro should only be used with operands that do not have side effects from being evaluated
 			 *             multiple times.
 			 *
-			 *  \param[in] x  First value to compare
-			 *  \param[in] y  First value to compare
+			 *  \param[in] x  First value to compare.
+			 *  \param[in] y  First value to compare.
 			 *
 			 *  \return The smaller of the two input parameters
 			 */
@@ -205,6 +205,26 @@
 				 *  \return String version of the expanded input.
 				 */
 				#define STRINGIFY_EXPANDED(x)   STRINGIFY(x)
+			#endif
+
+			#if !defined(CONCAT) || defined(__DOXYGEN__)
+				/** Concatenates the given input into a single token, via the C Preprocessor.
+				 *
+				 *  \param[in] x  First item to concatenate.
+				 *  \param[in] y  Second item to concatenate.
+				 *
+				 *  \return Concatenated version of the input.
+				 */
+				#define CONCAT(x, y)            x ## y
+
+				/** CConcatenates the given input into a single token after macro expansion, via the C Preprocessor.
+				 *
+				 *  \param[in] x  First item to concatenate.
+				 *  \param[in] y  Second item to concatenate.
+				 *
+				 *  \return Concatenated version of the expanded input.
+				 */
+				#define CONCAT_EXPANDED(x, y)   CONCAT(x, y)
 			#endif
 
 			#if !defined(ISR) || defined(__DOXYGEN__)

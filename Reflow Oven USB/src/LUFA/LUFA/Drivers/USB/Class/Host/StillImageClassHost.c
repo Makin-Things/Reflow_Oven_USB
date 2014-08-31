@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -302,7 +302,7 @@ bool SI_Host_IsEventReceived(USB_ClassInfo_SI_Host_t* const SIInterfaceInfo)
 	Pipe_SelectPipe(SIInterfaceInfo->Config.EventsPipe.Address);
 	Pipe_Unfreeze();
 
-	if (Pipe_BytesInPipe())
+	if (Pipe_IsINReceived())
 	  IsEventReceived = true;
 
 	Pipe_Freeze();

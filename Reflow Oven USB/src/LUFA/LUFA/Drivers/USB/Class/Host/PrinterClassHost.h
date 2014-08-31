@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,11 +40,11 @@
 /** \ingroup Group_USBClassPrinter
  *  \defgroup Group_USBClassPrinterHost Printer Class Host Mode Driver
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassPrinterHost_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Host/PrinterClassHost.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassPrinterHost_ModDescription Module Description
  *  Host Mode USB Class driver framework interface, for the Printer USB Class driver.
  *
  *  @{
@@ -231,7 +231,7 @@
 			 *
 			 *  \return Total number of buffered bytes received from the device.
 			 */
-			uint16_t PRNT_Host_BytesReceived(USB_ClassInfo_PRNT_Host_t* const PRNTInterfaceInfo);
+			uint16_t PRNT_Host_BytesReceived(USB_ClassInfo_PRNT_Host_t* const PRNTInterfaceInfo) ATTR_NON_NULL_PTR_ARG(1);
 
 			/** Reads a byte of data from the device. If no data is waiting to be read of if a USB device is not connected, the function
 			 *  returns a negative value. The \ref PRNT_Host_BytesReceived() function may be queried in advance to determine how many bytes
@@ -244,7 +244,7 @@
 			 *
 			 *  \return Next received byte from the device, or a negative value if no data received.
 			 */
-			int16_t PRNT_Host_ReceiveByte(USB_ClassInfo_PRNT_Host_t* const PRNTInterfaceInfo);
+			int16_t PRNT_Host_ReceiveByte(USB_ClassInfo_PRNT_Host_t* const PRNTInterfaceInfo) ATTR_NON_NULL_PTR_ARG(1);
 
 			/** Retrieves the attached printer device's ID string, formatted according to IEEE 1284. This string is sent as a
 			 *  Unicode string from the device and is automatically converted to an ASCII encoded C string by this function, thus

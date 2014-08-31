@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -85,17 +85,34 @@
 			 */
 			#define USB_STRING_LEN(UnicodeChars)      (sizeof(USB_Descriptor_Header_t) + ((UnicodeChars) << 1))
 
-			/** Macro to encode a given four digit floating point version number (e.g. 01.23) into Binary Coded
-			 *  Decimal format for descriptor fields requiring BCD encoding, such as the USB version number in the
-			 *  standard device descriptor.
+			/** Convenience macro to easily create \ref USB_Descriptor_String_t instances from a wide character string.
+			 *
+			 *  \note This macro is for little-endian systems only.
+			 *
+			 *  \param[in] String  String to initialize a USB String Descriptor structure with.
+			 */
+			#define USB_STRING_DESCRIPTOR(String)     { .Header = {.Size = sizeof(USB_Descriptor_Header_t) + (sizeof(String) - 2), .Type = DTYPE_String}, .UnicodeString = String }
+
+			/** Convenience macro to easily create \ref USB_Descriptor_String_t instances from an array of characters.
+			 *
+			 *  \param[in] ...  Characters to initialize a USB String Descriptor structure with.
+			 */
+			#define USB_STRING_DESCRIPTOR_ARRAY(...)  { .Header = {.Size = sizeof(USB_Descriptor_Header_t) + sizeof((uint16_t){__VA_ARGS__}), .Type = DTYPE_String}, .UnicodeString = {__VA_ARGS__} }
+
+			/** Macro to encode a given major/minor/revision version number into Binary Coded Decimal format for descriptor
+			 *  fields requiring BCD encoding, such as the USB version number in the standard device descriptor.
 			 *
 			 *  \note This value is automatically converted into Little Endian, suitable for direct use inside device
 			 *        descriptors on all architectures without endianness conversion macros.
 			 *
-			 *  \param[in]  x  Version number to encode as a 16-bit little-endian number, as a floating point number.
+			 *  \param[in]  Major     Major version number to encode.
+			 *  \param[in]  Minor     Minor version number to encode.
+			 *  \param[in]  Revision  Revision version number to encode.
 			 */
-			#define VERSION_BCD(x)                    CPU_TO_LE16((VERSION_TENS(x) << 12)  | (VERSION_ONES(x) << 8) | \
-			                                                      (VERSION_TENTHS(x) << 4) | (VERSION_HUNDREDTHS(x) << 0) )
+			#define VERSION_BCD(Major, Minor, Revision) \
+			                                          CPU_TO_LE16( ((Major & 0xFF) << 8) | \
+			                                                       ((Minor & 0x0F) << 4) | \
+			                                                       (Revision & 0x0F) )
 
 			/** String language ID for the English language. Should be used in \ref USB_Descriptor_String_t descriptors
 			 *  to indicate that the English language is supported by the device in its string descriptors.
@@ -275,7 +292,10 @@
 			{
 				USB_Descriptor_Header_t Header; /**< Descriptor header, including type and size. */
 
-				uint16_t USBSpecification; /**< BCD of the supported USB specification. */
+				uint16_t USBSpecification; /**< BCD of the supported USB specification.
+				                            *
+				                            *   \see \ref VERSION_BCD() utility macro.
+				                            */
 				uint8_t  Class; /**< USB device class. */
 				uint8_t  SubClass; /**< USB device subclass. */
 				uint8_t  Protocol; /**< USB device protocol. */
@@ -284,8 +304,10 @@
 
 				uint16_t VendorID; /**< Vendor ID for the USB product. */
 				uint16_t ProductID; /**< Unique product ID for the USB product. */
-				uint16_t ReleaseNumber; /**< Product release (version) number. */
-
+				uint16_t ReleaseNumber; /**< Product release (version) number.
+				                         *
+				                         *   \see \ref VERSION_BCD() utility macro.
+				                         */
 				uint8_t  ManufacturerStrIndex; /**< String index for the manufacturer's name. The
 				                                *   host will request this string via a separate
 				                                *   control request for the string descriptor.
@@ -301,12 +323,12 @@
 				                             *
 				                             *  \note On some microcontroller models, there is an embedded serial number
 				                             *        in the chip which can be used for the device serial number.
-				                             *        To use this serial number, set this to USE_INTERNAL_SERIAL.
-				                             *        On unsupported devices, this will evaluate to 0 and will cause
-				                             *        the host to generate a pseudo-unique value for the device upon
-				                             *        insertion.
+				                             *        To use this serial number, set this to \c USE_INTERNAL_SERIAL.
+				                             *        On unsupported devices, this will evaluate to \ref NO_DESCRIPTOR
+				                             *        and will cause the host to generate a pseudo-unique value for the
+				                             *        device upon insertion.
 				                             *
-				                             *  \see ManufacturerStrIndex structure entry.
+				                             *  \see \c ManufacturerStrIndex structure entry.
 				                             */
 				uint8_t  NumberOfConfigurations; /**< Total number of configurations supported by
 				                                  *   the device.
@@ -328,14 +350,20 @@
 				uint8_t  bDescriptorType; /**< Type of the descriptor, either a value in \ref USB_DescriptorTypes_t or a value
 				                              *   given by the specific class.
 				                              */
-				uint16_t bcdUSB; /**< BCD of the supported USB specification. */
+				uint16_t bcdUSB; /**< BCD of the supported USB specification.
+				                  *
+				                  *   \see \ref VERSION_BCD() utility macro.
+				                  */
 				uint8_t  bDeviceClass; /**< USB device class. */
 				uint8_t  bDeviceSubClass; /**< USB device subclass. */
 				uint8_t  bDeviceProtocol; /**< USB device protocol. */
 				uint8_t  bMaxPacketSize0; /**< Size of the control (address 0) endpoint's bank in bytes. */
 				uint16_t idVendor; /**< Vendor ID for the USB product. */
 				uint16_t idProduct; /**< Unique product ID for the USB product. */
-				uint16_t bcdDevice; /**< Product release (version) number. */
+				uint16_t bcdDevice; /**< Product release (version) number.
+				                     *
+				                     *   \see \ref VERSION_BCD() utility macro.
+				                     */
 				uint8_t  iManufacturer; /**< String index for the manufacturer's name. The
 				                         *   host will request this string via a separate
 				                         *   control request for the string descriptor.
@@ -351,12 +379,12 @@
 				                        *
 				                        *  \note On some microcontroller models, there is an embedded serial number
 				                        *        in the chip which can be used for the device serial number.
-				                        *        To use this serial number, set this to USE_INTERNAL_SERIAL.
-				                        *        On unsupported devices, this will evaluate to 0 and will cause
-				                        *        the host to generate a pseudo-unique value for the device upon
-				                        *        insertion.
+				                        *        To use this serial number, set this to \c USE_INTERNAL_SERIAL.
+				                        *        On unsupported devices, this will evaluate to \ref NO_DESCRIPTOR
+				                        *        and will cause the host to generate a pseudo-unique value for the
+				                        *        device upon insertion.
 				                        *
-				                        *  \see ManufacturerStrIndex structure entry.
+				                        *  \see \c ManufacturerStrIndex structure entry.
 				                        */
 				uint8_t  bNumConfigurations; /**< Total number of configurations supported by
 				                              *   the device.
@@ -374,7 +402,10 @@
 			{
 				USB_Descriptor_Header_t Header; /**< Descriptor header, including type and size. */
 
-				uint16_t USBSpecification; /**< BCD of the supported USB specification. */
+				uint16_t USBSpecification; /**< BCD of the supported USB specification.
+				                            *
+				                            *   \see \ref VERSION_BCD() utility macro.
+				                            */
 				uint8_t  Class; /**< USB device class. */
 				uint8_t  SubClass; /**< USB device subclass. */
 				uint8_t  Protocol; /**< USB device protocol. */
@@ -397,9 +428,12 @@
 			{
 				uint8_t  bLength; /**< Size of the descriptor, in bytes. */
 				uint8_t  bDescriptorType; /**< Type of the descriptor, either a value in \ref USB_DescriptorTypes_t or a value
-				                              *   given by the specific class.
-				                              */
-				uint16_t bcdUSB; /**< BCD of the supported USB specification. */
+				                           *   given by the specific class.
+				                           */
+				uint16_t bcdUSB; /**< BCD of the supported USB specification.
+				                  *
+				                  *   \see \ref VERSION_BCD() utility macro.
+				                  */
 				uint8_t  bDeviceClass; /**< USB device class. */
 				uint8_t  bDeviceSubClass; /**< USB device subclass. */
 				uint8_t  bDeviceProtocol; /**< USB device protocol. */
@@ -454,8 +488,8 @@
 			{
 				uint8_t  bLength; /**< Size of the descriptor, in bytes. */
 				uint8_t  bDescriptorType; /**< Type of the descriptor, either a value in \ref USB_DescriptorTypes_t or a value
-				                              *   given by the specific class.
-				                              */
+				                           *   given by the specific class.
+				                           */
 				uint16_t wTotalLength; /**< Size of the configuration descriptor header,
 				                           *   and all sub descriptors inside the configuration.
 				                           */
@@ -719,14 +753,6 @@
 				                     */
 			} ATTR_PACKED USB_StdDescriptor_String_t;
 
-	/* Private Interface - For use in library only: */
-	#if !defined(__DOXYGEN__)
-		/* Macros: */
-			#define VERSION_TENS(x)                   (int)((int)(x) / 10)
-			#define VERSION_ONES(x)                   (int)((int)(x) % 10)
-			#define VERSION_TENTHS(x)                 (int)((x - (int)x) * 10)
-			#define VERSION_HUNDREDTHS(x)             (int)((x * 100) - ((int)(x * 10) * 10))
-	#endif
 
 	/* Disable C linkage for C++ Compilers: */
 		#if defined(__cplusplus)

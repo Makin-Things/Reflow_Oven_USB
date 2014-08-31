@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -196,7 +196,7 @@
 			{
 				return (UPCFG0X & (1 << EPDIR)) ? PIPE_DIR_IN : PIPE_DIR_OUT;
 			}
-			
+
 			/** Returns the pipe address of the currently selected pipe. This is typically used to save the
 			 *  currently selected pipe address so that it can be restored after another pipe has been manipulated.
 			 *
@@ -321,8 +321,9 @@
 			static inline uint8_t Pipe_GetBoundEndpointAddress(void)
 			{
 				uint8_t UPCFG0X_Temp = UPCFG0X;
-				
-				return (((UPCFG0X_Temp >> PEPNUM0) & PIPE_EPNUM_MASK) | ((UPCFG0X_Temp & PEPNUM1) ? ENDPOINT_DIR_OUT : ENDPOINT_DIR_IN));
+
+				return (((UPCFG0X_Temp >> PEPNUM0) & PIPE_EPNUM_MASK) |
+				        ((UPCFG0X_Temp & (1 << PTOKEN1)) ? ENDPOINT_DIR_IN : ENDPOINT_DIR_OUT));
 			}
 
 			/** Sets the period between interrupts for an INTERRUPT type pipe to a specified number of milliseconds.
@@ -815,12 +816,12 @@
 			 *  \param[in] Entries  Number of entries in the pipe table to configure.
 			 *
 			 *  \return Boolean \c true if all pipes configured successfully, \c false otherwise.
-			 */			
+			 */
 			bool Pipe_ConfigurePipeTable(const USB_Pipe_Table_t* const Table,
 			                             const uint8_t Entries);
-										 
-			/** Configures the specified pipe address with the given pipe type, endpoint address within the attached device, bank size
-			 *  and number of hardware banks.
+
+			/** Configures the specified pipe address with the given pipe type, endpoint address within the attached device,
+			 *  bank size and number of hardware banks.
 			 *
 			 *  A newly configured pipe is frozen by default, and must be unfrozen before use via the \ref Pipe_Unfreeze()
 			 *  before being used. Pipes should be kept frozen unless waiting for data from a device while in IN mode, or

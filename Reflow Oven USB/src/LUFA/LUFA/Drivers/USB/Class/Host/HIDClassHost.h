@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,11 +40,11 @@
 /** \ingroup Group_USBClassHID
  *  \defgroup Group_USBClassHIDHost HID Class Host Mode Driver
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassHIDHost_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Host/HIDClassHost.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassHIDHost_ModDescription Module Description
  *  Host Mode USB Class driver framework interface, for the HID USB Class driver.
  *
  *  @{
@@ -93,9 +93,9 @@
 					#if !defined(HID_HOST_BOOT_PROTOCOL_ONLY)
 					HID_ReportInfo_t* HIDParserData; /**< HID parser data to store the parsed HID report data, when boot protocol
 					                                  *   is not used.
-													  *
+					                                  *
 					                                  *  \note When the \c HID_HOST_BOOT_PROTOCOL_ONLY compile time token is defined,
-					                                  *        this method is unavailable.
+					                                  *        this field is unavailable.
 					                                  */
 					#endif
 				} Config; /**< Config data for the USB class interface within the device. All elements in this section
@@ -120,9 +120,9 @@
 
 					uint8_t LargestReportSize; /**< Largest report the device will send, in bytes. */
 				} State; /**< State data for the USB class interface within the device. All elements in this section
-						  *   <b>may</b> be set to initial values, but may also be ignored to default to sane values when
-						  *   the interface is enumerated.
-						  */
+				          *   <b>may</b> be set to initial values, but may also be ignored to default to sane values when
+				          *   the interface is enumerated.
+				          */
 			} USB_ClassInfo_HID_Host_t;
 
 		/* Enums: */

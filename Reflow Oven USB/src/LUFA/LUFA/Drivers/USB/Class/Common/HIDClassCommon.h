@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,7 +40,7 @@
 /** \ingroup Group_USBClassHID
  *  \defgroup Group_USBClassHIDCommon  Common Class Definitions
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassHIDCommon_ModDescription Module Description
  *  Constants, Types and Enum definitions that are common to both Device and Host modes for the USB
  *  HID Class.
  *
@@ -371,7 +371,7 @@
 					HID_RI_PHYSICAL_MINIMUM(16, MinPhysicalVal), \
 					HID_RI_PHYSICAL_MAXIMUM(16, MaxPhysicalVal), \
 					HID_RI_REPORT_COUNT(8, 3),              \
-					HID_RI_REPORT_SIZE(8, ((((MinAxisVal >= -0xFF) && (MaxAxisVal <= 0xFF)) ? 8 : 16))), \
+					HID_RI_REPORT_SIZE(8, (((MinAxisVal >= -128) && (MaxAxisVal <= 127)) ? 8 : 16)), \
 					HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE), \
 				HID_RI_END_COLLECTION(0),                   \
 				HID_RI_USAGE_PAGE(8, 0x09),                 \
@@ -382,7 +382,7 @@
 				HID_RI_REPORT_SIZE(8, 0x01),                \
 				HID_RI_REPORT_COUNT(8, Buttons),            \
 				HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE), \
-				HID_RI_REPORT_SIZE(8, (8 - (Buttons % 8))), \
+				HID_RI_REPORT_SIZE(8, (Buttons % 8) ? (8 - (Buttons % 8)) : 0), \
 				HID_RI_REPORT_COUNT(8, 0x01),               \
 				HID_RI_INPUT(8, HID_IOF_CONSTANT),          \
 			HID_RI_END_COLLECTION(0)
@@ -476,7 +476,7 @@
 					HID_RI_REPORT_SIZE(8, 0x01),            \
 					HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE), \
 					HID_RI_REPORT_COUNT(8, 0x01),           \
-					HID_RI_REPORT_SIZE(8, (8 - (Buttons % 8))), \
+					HID_RI_REPORT_SIZE(8, (Buttons % 8) ? (8 - (Buttons % 8)) : 0), \
 					HID_RI_INPUT(8, HID_IOF_CONSTANT),      \
 					HID_RI_USAGE_PAGE(8, 0x01),             \
 					HID_RI_USAGE(8, 0x30),                  \
@@ -486,7 +486,7 @@
 					HID_RI_PHYSICAL_MINIMUM(16, MinPhysicalVal), \
 					HID_RI_PHYSICAL_MAXIMUM(16, MaxPhysicalVal), \
 					HID_RI_REPORT_COUNT(8, 0x02),           \
-					HID_RI_REPORT_SIZE(8, ((((MinAxisVal >= -0xFF) && (MaxAxisVal <= 0xFF)) ? 8 : 16))), \
+					HID_RI_REPORT_SIZE(8, (((MinAxisVal >= -128) && (MaxAxisVal <= 127)) ? 8 : 16)), \
 					HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | (AbsoluteCoords ? HID_IOF_ABSOLUTE : HID_IOF_RELATIVE)), \
 				HID_RI_END_COLLECTION(0),                   \
 			HID_RI_END_COLLECTION(0)
@@ -586,7 +586,10 @@
 		{
 			USB_Descriptor_Header_t Header; /**< Regular descriptor header containing the descriptor's type and length. */
 
-			uint16_t                HIDSpec; /**< BCD encoded version that the HID descriptor and device complies to. */
+			uint16_t                HIDSpec; /**< BCD encoded version that the HID descriptor and device complies to.
+			                                  *
+			                                  *   \see \ref VERSION_BCD() utility macro.
+			                                  */
 			uint8_t                 CountryCode; /**< Country code of the localized device, or zero if universal. */
 
 			uint8_t                 TotalReportDescriptors; /**< Total number of HID report descriptors for the interface. */
@@ -612,7 +615,10 @@
 			                           *   given by the specific class.
 			                           */
 
-			uint16_t bcdHID; /**< BCD encoded version that the HID descriptor and device complies to. */
+			uint16_t bcdHID; /**< BCD encoded version that the HID descriptor and device complies to.
+			                  *
+			                  *   \see \ref VERSION_BCD() utility macro.
+			                  */
 			uint8_t  bCountryCode; /**< Country code of the localized device, or zero if universal. */
 
 			uint8_t  bNumDescriptors; /**< Total number of HID report descriptors for the interface. */

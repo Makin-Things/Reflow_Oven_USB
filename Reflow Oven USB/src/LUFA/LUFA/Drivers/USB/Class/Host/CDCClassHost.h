@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,11 +40,11 @@
 /** \ingroup Group_USBClassCDC
  *  \defgroup Group_USBClassCDCHost CDC Class Host Mode Driver
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassCDCHost_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Host/CDCClassHost.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassCDCHost_ModDescription Module Description
  *  Host Mode USB Class driver framework interface, for the CDC USB Class driver.
  *
  *  @{
@@ -199,7 +199,7 @@
 			 */
 			uint8_t CDC_Host_SendData(USB_ClassInfo_CDC_Host_t* const CDCInterfaceInfo,
 			                          const void* const Buffer,
-			                          const uint16_t Length);
+			                          const uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
 
 			/** Sends a given null-terminated string to the attached USB device, if connected. If a device is not connected when the
 			 *  function is called, the string is discarded. Bytes will be queued for transmission to the device until either the pipe
@@ -291,7 +291,7 @@
 			 *  \param[in,out] Stream            Pointer to a FILE structure where the created stream should be placed.
 			 */
 			void CDC_Host_CreateStream(USB_ClassInfo_CDC_Host_t* const CDCInterfaceInfo,
-			                           FILE* const Stream);
+			                           FILE* const Stream) ATTR_NON_NULL_PTR_ARG(1) ATTR_NON_NULL_PTR_ARG(2);
 
 			/** Identical to \ref CDC_Host_CreateStream(), except that reads are blocking until the calling stream function terminates
 			 *  the transfer. While blocking, the USB and CDC service tasks are called repeatedly to maintain USB communications.
@@ -302,7 +302,7 @@
 			 *  \param[in,out] Stream            Pointer to a FILE structure where the created stream should be placed.
 			 */
 			void CDC_Host_CreateBlockingStream(USB_ClassInfo_CDC_Host_t* const CDCInterfaceInfo,
-			                                   FILE* const Stream);
+			                                   FILE* const Stream) ATTR_NON_NULL_PTR_ARG(1)  ATTR_NON_NULL_PTR_ARG(2);
 			#endif
 
 			/** CDC class driver event for a control line state change on a CDC host interface. This event fires each time the device notifies

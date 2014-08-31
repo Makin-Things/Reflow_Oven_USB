@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -82,7 +82,7 @@
 				 *
 				 *  \param[in] x  Value to check compile-time constantness of.
 				 *
-				 *  \return Boolean true if the given value is known to be a compile time constant, false otherwise.
+				 *  \return Boolean \c true if the given value is known to be a compile time constant, \c false otherwise.
 				 */
 				#define GCC_IS_COMPILE_CONST(x)               __builtin_constant_p(x)
 			#else

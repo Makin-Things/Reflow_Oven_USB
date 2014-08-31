@@ -56,9 +56,6 @@
 #include <LUFA/Common/Common.h>
 #include <LUFA/Version.h>
 
-// From module: LUFA Platform Specific Support - AVR8
-#include <LUFA/Platform/Platform.h>
-
 // From module: LUFA USB Driver
 #include <LUFA/Drivers/USB/USB.h>
 

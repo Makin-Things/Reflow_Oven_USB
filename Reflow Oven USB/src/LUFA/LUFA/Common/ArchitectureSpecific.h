@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -70,7 +70,7 @@
 					 *
 					 *  \note This macro is not available for all architectures.
 					 */
-					#define JTAG_ENABLE()                  MACROS{                                      \
+					#define JTAG_ENABLE()                  MACROS{                                       \
 																	__asm__ __volatile__ (               \
 																	"in __tmp_reg__,__SREG__" "\n\t"     \
 																	"cli" "\n\t"                         \
@@ -136,14 +136,14 @@
 				 *
 				 *  \param[in] Condition  Condition that will be evaluated,
 				 */
-				#define STDOUT_ASSERT(Condition)        MACROS{ if (!(x)) {                                             \
+				#define STDOUT_ASSERT(Condition)        MACROS{ if (!(Condition)) {                                     \
 				                                                     printf_P(PSTR("%s: Function \"%s\", Line %d: "     \
 				                                                                   "Assertion \"%s\" failed.\r\n"),     \
 				                                                                   __FILE__, __func__, __LINE__, #Condition); } }MACROE
 
 				#if !defined(pgm_read_ptr) || defined(__DOXYGEN__)
 					/** Reads a pointer out of PROGMEM space on the AVR8 architecture. This is currently a wrapper for the
-					 *  avr-libc \c pgm_read_ptr() macro with a \c void* cast, so that its value can be assigned directly
+					 *  avr-libc \c pgm_read_word() macro with a \c void* cast, so that its value can be assigned directly
 					 *  to a pointer variable or used in pointer arithmetic without further casting in C. In a future
 					 *  avr-libc distribution this will be part of the standard API and will be implemented in a more formal
 					 *  manner.
@@ -160,7 +160,7 @@
 				#define JTAG_DEBUG_POINT()              __asm__ __volatile__ ("nop" ::)
 				#define JTAG_DEBUG_BREAK()              __asm__ __volatile__ ("breakpoint" ::)
 				#define JTAG_ASSERT(Condition)          MACROS{ if (!(Condition)) { JTAG_DEBUG_BREAK(); } }MACROE
-				#define STDOUT_ASSERT(Condition)        MACROS{ if (!(x)) {                                      \
+				#define STDOUT_ASSERT(Condition)        MACROS{ if (!(Condition)) {                              \
 				                                                     printf("%s: Function \"%s\", Line %d: "     \
 				                                                            "Assertion \"%s\" failed.\r\n"),     \
 				                                                            __FILE__, __func__, __LINE__, #Condition); } }MACROE

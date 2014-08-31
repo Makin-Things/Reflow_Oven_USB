@@ -58,7 +58,7 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 {
 	.Header                 = {.Size = sizeof(USB_Descriptor_Device_t), .Type = DTYPE_Device},
 
-	.USBSpecification       = VERSION_BCD(01.10),
+	.USBSpecification       = VERSION_BCD(1,10,0),
 	.Class                  = CDC_CSCP_CDCClass,
 	.SubClass               = CDC_CSCP_NoSpecificSubclass,
 	.Protocol               = CDC_CSCP_NoSpecificProtocol,
@@ -67,7 +67,7 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 
 	.VendorID               = 0x03EB,
 	.ProductID              = 0x2044,
-	.ReleaseNumber          = VERSION_BCD(00.01),
+	.ReleaseNumber          = VERSION_BCD(0,1,0),
 
 	.ManufacturerStrIndex   = 0x01,
 	.ProductStrIndex        = 0x02,
@@ -119,7 +119,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.Header                 = {.Size = sizeof(USB_CDC_Descriptor_FunctionalHeader_t), .Type = DTYPE_CSInterface},
 			.Subtype                = CDC_DSUBTYPE_CSInterface_Header,
 
-			.CDCSpecification       = VERSION_BCD(01.10),
+			.CDCSpecification       = VERSION_BCD(1,10,0),
 		},
 
 	.CDC_Functional_ACM =
@@ -205,7 +205,7 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
 
-	.UnicodeString          = L"Dean Camera"
+	.UnicodeString          = L"ProAtomic Software Development"
 };
 
 /** Product descriptor string. This is a Unicode string containing the product's details in human readable form,
@@ -216,7 +216,7 @@ const USB_Descriptor_String_t PROGMEM ProductString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(13), .Type = DTYPE_String},
 
-	.UnicodeString          = L"LUFA CDC Demo"
+	.UnicodeString          = L"Reflow Oven Bootloader"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"

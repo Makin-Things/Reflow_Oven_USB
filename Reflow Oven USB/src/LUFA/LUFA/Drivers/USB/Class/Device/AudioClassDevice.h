@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,11 +40,11 @@
 /** \ingroup Group_USBClassAudio
  *  \defgroup Group_USBClassAudioDevice Audio 1.0 Class Device Mode Driver
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassAudioDevice_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Device/AudioClassDevice.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassAudioDevice_ModDescription Module Description
  *  Device Mode USB Class driver framework interface, for the Audio 1.0 USB Class driver.
  *
  *  @{

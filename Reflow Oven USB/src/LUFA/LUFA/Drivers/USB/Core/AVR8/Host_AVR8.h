@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -236,7 +236,7 @@
 			}
 
 			/** Determines if the attached device is currently issuing a Remote Wakeup request, requesting
-			 *  that the host resume the USB bus and wake up the device, false otherwise.
+			 *  that the host resume the USB bus and wake up the device, \c false otherwise.
 			 *
 			 *  \return Boolean \c true if the attached device has sent a Remote Wakeup request, \c false otherwise.
 			 */

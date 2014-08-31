@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -41,7 +41,7 @@
  *
  *  \brief Core driver for the microcontroller hardware USB module
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USB_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Core/ConfigDescriptors.c <i>(Makefile source module name: LUFA_SRC_USB)</i>
  *    - LUFA/Drivers/USB/Core/DeviceStandardReq.c <i>(Makefile source module name: LUFA_SRC_USB)</i>
@@ -58,7 +58,7 @@
  *    - LUFA/Drivers/USB/Core/<i>ARCH</i>/USBInterrupt_<i>ARCH</i>.c <i>(Makefile source module name: LUFA_SRC_USB)</i>
  *    - LUFA/Drivers/USB/Class/Common/HIDParser.c <i>(Makefile source module name: LUFA_SRC_USB)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USB_ModDescription Module Description
  *  Driver and framework for the USB controller of the selected architecture and microcontroller model. This module
  *  consists of many submodules, and is designed to provide an easy way to configure and control USB host, device
  *  or OTG mode USB applications.
@@ -127,8 +127,8 @@
  *  </tr>
  *  <tr>
  *   <td>Printer</td>
- *   <td bgcolor="#EE0000">No</td>
-*    <td bgcolor="#00EE00">Yes</td>
+ *   <td bgcolor="#00EE00">Yes</td>
+ *   <td bgcolor="#00EE00">Yes</td>
  *  </tr>
  *  <tr>
  *   <td>RNDIS</td>
@@ -143,13 +143,13 @@
  *  </table>
  *
  *
- *  \section Sec_UsingClassDrivers Using the Class Drivers
+ *  \section Sec_USB_UsingClassDrivers Using the Class Drivers
  *  To make the Class drivers easy to integrate into a user application, they all implement a standardized
  *  design with similarly named/used function, enums, defines and types. The two different modes are implemented
  *  slightly differently, and thus will be explained separately. For information on a specific class driver, read
  *  the class driver's module documentation.
  *
- *  \subsection Sec_ClassDriverDevice Device Mode Class Drivers
+ *  \subsection Sec_USB_ClassDriverDevice Device Mode Class Drivers
  *  Implementing a Device Mode Class Driver in a user application requires a number of steps to be followed. Firstly,
  *  the module configuration and state structure must be added to the project source. These structures are named in a
  *  similar manner between classes, that of <tt>USB_ClassInfo_<i>{Class Name}</i>_Device_t</tt>, and are used to hold the
@@ -193,7 +193,7 @@
  *  void EVENT_USB_Device_ConfigurationChanged(void)
  *  {
  *      LEDs_SetAllLEDs(LEDMASK_USB_READY);
- *      
+ *
  *      if (!(Audio_Device_ConfigureEndpoints(&My_Audio_Interface)))
  *          LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
  *  }
@@ -209,14 +209,14 @@
  *  int main(void)
  *  {
  *      SetupHardware();
- *      
+ *
  *      LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
- *      
+ *
  *      for (;;)
  *      {
  *          if (USB_DeviceState != DEVICE_STATE_Configured)
  *            Create_And_Process_Samples();
- *          
+ *
  *          Audio_Device_USBTask(&My_Audio_Interface);
  *          USB_USBTask();
  *      }
@@ -249,7 +249,7 @@
  *  read and write routines. See each driver's individual documentation for more information on the
  *  class-specific functions.
  *
- *  \subsection Sec_ClassDriverHost Host Mode Class Drivers
+ *  \subsection Sec_USB_ClassDriverHost Host Mode Class Drivers
  *  Implementing a Host Mode Class Driver in a user application requires a number of steps to be followed. Firstly,
  *  the module configuration and state structure must be added to the project source. These structures are named in a
  *  similar manner between classes, that of <tt>USB_ClassInfo_<b>{Class Name}</b>_Host_t</tt>, and are used to hold the
@@ -297,30 +297,30 @@
  *  void EVENT_USB_Host_DeviceEnumerationComplete(void)
  *  {
  *      LEDs_SetAllLEDs(LEDMASK_USB_ENUMERATING);
- *      
+ *
  *      uint16_t ConfigDescriptorSize;
  *      uint8_t  ConfigDescriptorData[512];
- *      
+ *
  *      if (USB_Host_GetDeviceConfigDescriptor(1, &ConfigDescriptorSize, ConfigDescriptorData,
  *                                             sizeof(ConfigDescriptorData)) != HOST_GETCONFIG_Successful)
  *      {
  *          LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
  *          return;
  *      }
- *      
+ *
  *      if (MIDI_Host_ConfigurePipes(&Keyboard_MIDI_Interface,
  *                                   ConfigDescriptorSize, ConfigDescriptorData) != MIDI_ENUMERROR_NoError)
  *      {
  *          LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
  *          return;
  *      }
- *      
+ *
  *      if (USB_Host_SetDeviceConfiguration(1) != HOST_SENDCONTROL_Successful)
  *      {
  *          LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
  *          return;
  *      }
- *      
+ *
  *      LEDs_SetAllLEDs(LEDMASK_USB_READY);
  *  }
  *  \endcode
@@ -333,7 +333,7 @@
  *  the configuration will fail.
  *
  *  To complete the device enumeration after binding the host mode Class Drivers to the attached device, a call to
- *  \c USB_Host_SetDeviceConfiguration() must be made. If the device configuration is not set within the 
+ *  \c USB_Host_SetDeviceConfiguration() must be made. If the device configuration is not set within the
  *  \c EVENT_USB_Host_DeviceEnumerationComplete() event, the host still will assume the device enumeration has failed.
  *
  *  Once initialized, it is important to maintain the class driver's state by repeatedly calling the Class Driver's
@@ -346,14 +346,14 @@
  *  int main(void)
  *  {
  *      SetupHardware();
- *      
+ *
  *      LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
- *      
+ *
  *      for (;;)
  *      {
  *          if (USB_HostState != HOST_STATE_Configured)
  *              Create_And_Process_Samples();
- *          
+ *
  *          MIDI_Host_USBTask(&My_Audio_Interface);
  *          USB_USBTask();
  *      }

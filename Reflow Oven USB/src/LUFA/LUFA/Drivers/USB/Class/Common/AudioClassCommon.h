@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,7 +40,7 @@
 /** \ingroup Group_USBClassAudio
  *  \defgroup Group_USBClassAudioCommon  Common Class Definitions
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassAudioCommon_ModDescription Module Description
  *  Constants, Types and Enum definitions that are common to both Device and Host modes for the USB
  *  Audio 1.0 Class.
  *
@@ -435,7 +435,10 @@
 			                                  *   a value from the \ref Audio_CSInterface_AS_SubTypes_t enum.
 			                                  */
 
-			uint16_t                ACSpecification; /**< Binary coded decimal value, indicating the supported Audio Class specification version. */
+			uint16_t                ACSpecification; /**< Binary Coded Decimal value, indicating the supported Audio Class specification version.
+			                                          *
+			                                          *   \see \ref VERSION_BCD() utility macro.
+			                                          */
 			uint16_t                TotalLength; /**< Total length of the Audio class-specific descriptors, including this descriptor. */
 
 			uint8_t                 InCollection; /**< Total number of Audio Streaming interfaces linked to this Audio Control interface (must be 1). */
@@ -464,7 +467,10 @@
 			                             *   a value from the \ref Audio_CSInterface_AS_SubTypes_t enum.
 			                             */
 
-			uint16_t bcdADC; /**< Binary coded decimal value, indicating the supported Audio Class specification version. */
+			uint16_t bcdADC; /**< Binary coded decimal value, indicating the supported Audio Class specification version.
+			                  *
+			                  *   \see \ref VERSION_BCD() utility macro.
+			                  */
 			uint16_t wTotalLength; /**< Total length of the Audio class-specific descriptors, including this descriptor. */
 
 			uint8_t  bInCollection; /**< Total number of Audio Streaming interfaces linked to this Audio Control interface (must be 1). */
@@ -612,7 +618,7 @@
 
 		/** \brief 24-Bit Audio Frequency Structure.
 		 *
-		 *  Type define for a 24bit audio sample frequency structure. As GCC does not contain a built in 24-bit datatype,
+		 *  Type define for a 24-bit audio sample frequency structure. As GCC does not contain a built in 24-bit datatype,
 		 *  this this structure is used to build up the value instead. Fill this structure with the \ref AUDIO_SAMPLE_FREQ() macro.
 		 *
 		 *  \note Regardless of CPU architecture, these values should be stored as little endian.

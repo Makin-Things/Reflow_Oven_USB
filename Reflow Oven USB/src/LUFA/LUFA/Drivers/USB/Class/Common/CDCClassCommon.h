@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,7 +40,7 @@
 /** \ingroup Group_USBClassCDC
  *  \defgroup Group_USBClassCDCCommon  Common Class Definitions
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassCDCCommon_ModDescription Module Description
  *  Constants, Types and Enum definitions that are common to both Device and Host modes for the USB
  *  CDC Class.
  *
@@ -114,7 +114,7 @@
 
 		/** Macro to define a CDC class-specific functional descriptor. CDC functional descriptors have a
 		 *  uniform structure but variable sized data payloads, thus cannot be represented accurately by
-		 *  a single typedef struct. A macro is used instead so that functional descriptors can be created
+		 *  a single \c typedef \c struct. A macro is used instead so that functional descriptors can be created
 		 *  easily by specifying the size of the payload. This allows \c sizeof() to work correctly.
 		 *
 		 *  \param[in] DataSize  Size in bytes of the CDC functional descriptor's data payload.
@@ -176,11 +176,11 @@
 		/** Enum for the CDC class specific notification requests that can be issued by a CDC device to a host. */
 		enum CDC_ClassNotifications_t
 		{
-			CDC_NOTIF_SerialState               = 0x20, /**< Notification type constant for a change in the virtual serial port
-			                                             *   handshake line states, for use with a \ref USB_Request_Header_t
-			                                             *   notification structure when sent to the host via the CDC notification
-			                                             *   endpoint.
-			                                             */
+			CDC_NOTIF_SerialState = 0x20, /**< Notification type constant for a change in the virtual serial port
+			                               *   handshake line states, for use with a \ref USB_Request_Header_t
+			                               *   notification structure when sent to the host via the CDC notification
+			                               *   endpoint.
+			                               */
 		};
 
 		/** Enum for the CDC class specific interface descriptor subtypes. */
@@ -242,6 +242,8 @@
 			                                  */
 			uint16_t                CDCSpecification; /**< Version number of the CDC specification implemented by the device,
 			                                           *   encoded in BCD format.
+			                                           *
+			                                           *   \see \ref VERSION_BCD() utility macro.
 			                                           */
 		} ATTR_PACKED USB_CDC_Descriptor_FunctionalHeader_t;
 
@@ -265,7 +267,10 @@
 			uint8_t  bDescriptorSubType; /**< Sub type value used to distinguish between CDC class-specific descriptors,
 			                              *   must be \ref CDC_DSUBTYPE_CSInterface_Header.
 			                              */
-			uint16_t bcdCDC; /**< Version number of the CDC specification implemented by the device, encoded in BCD format. */
+			uint16_t bcdCDC; /**< Version number of the CDC specification implemented by the device, encoded in BCD format.
+			                  *
+			                  *   \see \ref VERSION_BCD() utility macro.
+			                  */
 		} ATTR_PACKED USB_CDC_StdDescriptor_FunctionalHeader_t;
 
 		/** \brief CDC class-specific Functional ACM Descriptor (LUFA naming conventions).
@@ -284,7 +289,7 @@
 			                                  *   must be \ref CDC_DSUBTYPE_CSInterface_ACM.
 			                                  */
 			uint8_t                 Capabilities; /**< Capabilities of the ACM interface, given as a bit mask. For most devices,
-			                                       *   this should be set to a fixed value of 0x06 - for other capabilities, refer
+			                                       *   this should be set to a fixed value of \c 0x06 - for other capabilities, refer
 			                                       *   to the CDC ACM specification.
 			                                       */
 		} ATTR_PACKED USB_CDC_Descriptor_FunctionalACM_t;

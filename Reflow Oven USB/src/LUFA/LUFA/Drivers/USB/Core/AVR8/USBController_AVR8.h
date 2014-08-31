@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -132,6 +132,14 @@
 			 *  \note See USB AVR data sheet for more information on the internal pad regulator.
 			 */
 			#define USB_OPT_REG_ENABLED                (0 << 1)
+
+			/** Option mask for \ref USB_Init() to keep regulator enabled at all times. Indicates that \ref USB_Disable()
+			 *  should not disable the regulator as it would otherwise. Has no effect if regulator is disabled using
+			 *  \ref USB_OPT_REG_DISABLED.
+			 *
+			 *  \note See USB AVR data sheet for more information on the internal pad regulator.
+			 */
+			#define USB_OPT_REG_KEEP_ENABLED           (1 << 3)
 
 			/** Manual PLL control option mask for \ref USB_Init(). This indicates to the library that the user application
 			 *  will take full responsibility for controlling the AVR's PLL (used to generate the high frequency clock
@@ -301,20 +309,6 @@
 			#elif defined(USE_STATIC_OPTIONS)
 				#define USB_Options USE_STATIC_OPTIONS
 			#endif
-
-		/* Enums: */
-			/** Enum for the possible USB controller modes, for initialization via \ref USB_Init() and indication back to the
-			 *  user application via \ref USB_CurrentMode.
-			 */
-			enum USB_Modes_t
-			{
-				USB_MODE_None   = 0, /**< Indicates that the controller is currently not initialized in any specific USB mode. */
-				USB_MODE_Device = 1, /**< Indicates that the controller is currently initialized in USB Device mode. */
-				USB_MODE_Host   = 2, /**< Indicates that the controller is currently initialized in USB Host mode. */
-				USB_MODE_UID    = 3, /**< Indicates that the controller should determine the USB mode from the UID pin of the
-				                      *   USB connector.
-				                      */
-			};
 
 	/* Private Interface - For use in library only: */
 	#if !defined(__DOXYGEN__)

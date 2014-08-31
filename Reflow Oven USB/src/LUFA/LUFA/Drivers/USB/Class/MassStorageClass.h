@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -41,12 +41,12 @@
  *  \defgroup Group_USBClassMS Mass Storage Class Driver
  *  \brief USB class driver for the USB-IF Bulk-Only Transport Mass Storage class standard.
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassMS_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *    - LUFA/Drivers/USB/Class/Host/MassStorageClassHost.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassMS_ModDescription Module Description
  *  Mass Storage Class Driver module. This module contains an internal implementation of the USB Mass Storage Class, for both
  *  Device and Host USB modes. User applications can use this class driver instead of implementing the Mass Storage class
  *  manually via the low-level LUFA APIs.

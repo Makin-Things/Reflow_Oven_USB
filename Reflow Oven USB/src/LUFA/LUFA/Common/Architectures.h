@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -67,7 +67,7 @@
 			/** Selects the Atmel 32-bit UC3 AVR (AT32UC3* chips) architecture. */
 			#define ARCH_UC3            1
 
-			/** Selects the Atmel XMEGA AVR (ATXMEGA*U chips) architecture. */
+			/** Selects the Atmel XMEGA AVR (ATXMEGA* chips) architecture. */
 			#define ARCH_XMEGA          2
 
 			#if !defined(__DOXYGEN__)

@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,11 +40,11 @@
 /** \ingroup Group_USBClassCDC
  *  \defgroup Group_USBClassCDCDevice CDC Class Device Mode Driver
  *
- *  \section Sec_Dependencies Module Source Dependencies
+ *  \section Sec_USBClassCDCDevice_Dependencies Module Source Dependencies
  *  The following files must be built with any user project that uses this module:
  *    - LUFA/Drivers/USB/Class/Device/CDCClassDevice.c <i>(Makefile source module name: LUFA_SRC_USBCLASS)</i>
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassCDCDevice_ModDescription Module Description
  *  Device Mode USB Class driver framework interface, for the CDC USB Class driver.
  *
  *  \note There are several major drawbacks to the CDC-ACM standard USB class, however
@@ -120,9 +120,9 @@
 											    */
 					} ControlLineStates; /**< Current states of the virtual serial port's control lines between the device and host. */
 
-					CDC_LineEncoding_t LineEncoding; /** Line encoding used in the virtual serial port, for the device's information.
-					                                  *  This is generally only used if the virtual serial port data is to be
-					                                  *  reconstructed on a physical UART.
+					CDC_LineEncoding_t LineEncoding; /**< Line encoding used in the virtual serial port, for the device's information.
+					                                  *   This is generally only used if the virtual serial port data is to be
+					                                  *   reconstructed on a physical UART.
 					                                  */
 				} State; /**< State data for the USB class interface within the device. All elements in this section
 				          *   are reset to their defaults when the interface is enumerated.
@@ -157,7 +157,7 @@
 			/** CDC class driver event for a line encoding change on a CDC interface. This event fires each time the host requests a
 			 *  line encoding change (containing the serial parity, baud and other configuration information) and may be hooked in the
 			 *  user program by declaring a handler function with the same name and parameters listed here. The new line encoding
-			 *  settings are available in the LineEncoding structure inside the CDC interface structure passed as a parameter.
+			 *  settings are available in the \c LineEncoding structure inside the CDC interface structure passed as a parameter.
 			 *
 			 *  \param[in,out] CDCInterfaceInfo  Pointer to a structure containing a CDC Class configuration and state.
 			 */
@@ -293,7 +293,7 @@
 			 *  be used when the read data is processed byte-per-bye (via \c getc()) or when the user application will implement its own
 			 *  line buffering.
 			 *
-			 *  \note The created stream can be given as \c stdout if desired to direct the standard output from all <stdio.h> functions
+			 *  \note The created stream can be given as \c stdout if desired to direct the standard output from all \c <stdio.h> functions
 			 *        to the given CDC interface.
 			 *        \n\n
 			 *

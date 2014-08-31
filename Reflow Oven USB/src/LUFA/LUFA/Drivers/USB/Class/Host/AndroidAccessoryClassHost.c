@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -167,7 +167,7 @@ uint8_t AOA_Host_StartAccessoryMode(USB_ClassInfo_AOA_Host_t* const AOAInterface
 	if ((ErrorCode = AOA_Host_GetAccessoryProtocol(&AccessoryProtocol)) != HOST_WAITERROR_Successful)
 	  return ErrorCode;
 
-	if (AccessoryProtocol != CPU_TO_LE16(AOA_PROTOCOL_AccessoryV1))
+	if ((AccessoryProtocol != CPU_TO_LE16(AOA_PROTOCOL_AccessoryV1)) && (AccessoryProtocol != CPU_TO_LE16(AOA_PROTOCOL_AccessoryV2)))
 	  return AOA_ERROR_LOGICAL_CMD_FAILED;
 
 	for (uint8_t PropertyIndex = 0; PropertyIndex < AOA_STRING_TOTAL_STRINGS; PropertyIndex++)

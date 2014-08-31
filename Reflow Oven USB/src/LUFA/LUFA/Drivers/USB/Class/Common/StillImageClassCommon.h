@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,7 +40,7 @@
 /** \ingroup Group_USBClassSI
  *  \defgroup Group_USBClassSICommon  Common Class Definitions
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassSICommon_ModDescription Module Description
  *  Constants, Types and Enum definitions that are common to both Device and Host modes for the USB
  *  Still Image Class.
  *
@@ -119,18 +119,18 @@
 		{
 			PIMA_RESPONSE_OK                    = 1, /**< Response code indicating no error in the issued command. */
 			PIMA_RESPONSE_GeneralError          = 2, /**< Response code indicating a general error while processing the
-			                                             *  issued command.
-			                                             */
+			                                          *  issued command.
+			                                          */
 			PIMA_RESPONSE_SessionNotOpen        = 3, /**< Response code indicating that the sent command requires an open
-			                                             *   session before being issued.
-			                                             */
+			                                          *   session before being issued.
+			                                          */
 			PIMA_RESPONSE_InvalidTransaction    = 4, /**< Response code indicating an invalid transaction occurred. */
 			PIMA_RESPONSE_OperationNotSupported = 5, /**< Response code indicating that the issued command is not supported
-			                                             *   by the attached device.
-			                                             */
+			                                          *   by the attached device.
+			                                          */
 			PIMA_RESPONSE_ParameterNotSupported = 6, /**< Response code indicating that one or more of the issued command's
-			                                             *   parameters are not supported by the device.
-			                                             */
+			                                          *   parameters are not supported by the device.
+			                                          */
 		};
 
 	/* Type Defines: */

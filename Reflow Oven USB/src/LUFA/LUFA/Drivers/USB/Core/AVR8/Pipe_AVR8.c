@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -47,13 +47,13 @@ bool Pipe_ConfigurePipeTable(const USB_Pipe_Table_t* const Table,
 	{
 		if (!(Table[i].Address))
 		  continue;
-	
+
 		if (!(Pipe_ConfigurePipe(Table[i].Address, Table[i].Type, Table[i].EndpointAddress, Table[i].Size, Table[i].Banks)))
 		{
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -65,7 +65,7 @@ bool Pipe_ConfigurePipe(const uint8_t Address,
 {
 	uint8_t Number = (Address & PIPE_EPNUM_MASK);
 	uint8_t Token  = (Address & PIPE_DIR_IN) ? PIPE_TOKEN_IN : PIPE_TOKEN_OUT;
-	
+
 	if (Number >= PIPE_TOTAL_PIPES)
 	  return false;
 
@@ -97,7 +97,7 @@ bool Pipe_ConfigurePipe(const uint8_t Address,
 		if (PNum == Number)
 		{
 			UPCFG0XTemp = ((Type << EPTYPE0) | Token | ((EndpointAddress & PIPE_EPNUM_MASK) << PEPNUM0));
-			UPCFG1XTemp = ((1 << ALLOC) | Banks | Pipe_BytesToEPSizeMask(Size));
+			UPCFG1XTemp = ((1 << ALLOC) | ((Banks > 1) ? (1 << EPBK0) : 0) | Pipe_BytesToEPSizeMask(Size));
 			UPCFG2XTemp = 0;
 			UPIENXTemp  = 0;
 		}

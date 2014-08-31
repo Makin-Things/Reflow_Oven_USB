@@ -1,13 +1,13 @@
 /*
              LUFA Library
-     Copyright (C) Dean Camera, 2013.
+     Copyright (C) Dean Camera, 2014.
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
 */
 
 /*
-  Copyright 2013  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -40,7 +40,7 @@
 /** \ingroup Group_USBClassMIDI
  *  \defgroup Group_USBClassMIDICommon  Common Class Definitions
  *
- *  \section Sec_ModDescription Module Description
+ *  \section Sec_USBClassMIDICommon_ModDescription Module Description
  *  Constants, Types and Enum definitions that are common to both Device and Host modes for the USB
  *  MIDI Class.
  *
@@ -68,17 +68,55 @@
 		#endif
 
 	/* Macros: */
-		/** \name MIDI Command Values */
+		/** \name MIDI Command Values
+		 *  See http://www.midi.org/techspecs/midimessages.php for more information.
+		 */
 		//@{
-		/** MIDI command for a note on (activation) event. */
-		#define MIDI_COMMAND_NOTE_ON        0x90
+		/** MIDI command for System Exclusive (SysEx) single event that has one byte of data total. */
+		#define MIDI_COMMAND_SYSEX_1BYTE           MIDI_COMMAND_SYSEX_END_1BYTE
+
+		/** MIDI command for System Exclusive (SysEx) single event that has two bytes of data total. */
+		#define MIDI_COMMAND_SYSEX_2BYTE           0x20
+
+		/** MIDI command for System Exclusive (SysEx) single event that has three bytes of data total. */
+		#define MIDI_COMMAND_SYSEX_3BYTE           0x30
+
+		/** MIDI command for System Exclusive (SysEx) stream event that has at least four bytes of data total. */
+		#define MIDI_COMMAND_SYSEX_START_3BYTE     0x40
+
+		/** MIDI command for System Exclusive (SysEx) stream event terminator with one remaining data byte. */
+		#define MIDI_COMMAND_SYSEX_END_1BYTE       0x50
+
+		/** MIDI command for System Exclusive (SysEx) stream event terminator with two remaining data bytes. */
+		#define MIDI_COMMAND_SYSEX_END_2BYTE       0x60
+
+		/** MIDI command for System Exclusive (SysEx) stream event terminator with three remaining data bytes. */
+		#define MIDI_COMMAND_SYSEX_END_3BYTE       0x70
 
 		/** MIDI command for a note off (deactivation) event. */
-		#define MIDI_COMMAND_NOTE_OFF       0x80
+		#define MIDI_COMMAND_NOTE_OFF              0x80
+
+		/** MIDI command for a note on (activation) event. */
+		#define MIDI_COMMAND_NOTE_ON               0x90
+
+		/** MIDI command for a note pressure change event. */
+		#define MIDI_COMMAND_NOTE_PRESSURE         0xA0
+
+		/** MIDI command for a control change event. */
+		#define MIDI_COMMAND_CONTROL_CHANGE        0xB0
+
+		/** MIDI command for a control change event. */
+		#define MIDI_COMMAND_PROGRAM_CHANGE        0xC0
+
+		/** MIDI command for a channel pressure change event. */
+		#define MIDI_COMMAND_CHANNEL_PRESSURE      0xD0
+
+		/** MIDI command for a pitch change event. */
+		#define MIDI_COMMAND_PITCH_WHEEL_CHANGE    0xE0
 		//@}
 
 		/** Standard key press velocity value used for all note events. */
-		#define MIDI_STANDARD_VELOCITY      64
+		#define MIDI_STANDARD_VELOCITY             64
 
 		/** Convenience macro. MIDI channels are numbered from 1-10 (natural numbers) however the logical channel
 		 *  addresses are zero-indexed. This converts a natural MIDI channel number into the logical channel address.
@@ -87,8 +125,8 @@
 		 *
 		 *  \return Constructed MIDI channel ID.
 		 */
-		#define MIDI_CHANNEL(channel)        ((channel) - 1)
-		
+		#define MIDI_CHANNEL(channel)              ((channel) - 1)
+
 		/** Constructs a MIDI event ID from a given MIDI command and a virtual MIDI cable index. This can then be
 		 *  used to create and decode \ref MIDI_EventPacket_t MIDI event packets.
 		 *
@@ -97,7 +135,7 @@
 		 *
 		 *  \return Constructed MIDI event ID.
 		 */
-		#define MIDI_EVENT(virtualcable, command) ((virtualcable << 4) | (command >> 4))
+		#define MIDI_EVENT(virtualcable, command)  ((virtualcable << 4) | (command >> 4))
 
 	/* Enums: */
 		/** Enum for the possible MIDI jack types in a MIDI device jack descriptor. */
@@ -125,6 +163,8 @@
 
 			uint16_t                AudioSpecification; /**< Binary coded decimal value, indicating the supported Audio Class
 			                                             *   specification version.
+			                                             *
+			                                             *   \see \ref VERSION_BCD() utility macro.
 			                                             */
 			uint16_t                TotalLength; /**< Total length of the Audio class-specific descriptors, including this descriptor. */
 		} ATTR_PACKED USB_MIDI_Descriptor_AudioInterface_AS_t;
@@ -149,7 +189,10 @@
 
 			uint8_t  bDescriptorSubtype; /**< Sub type value used to distinguish between audio class-specific descriptors. */
 
-			uint16_t bcdMSC; /**< Binary coded decimal value, indicating the supported MIDI Class specification version. */
+			uint16_t bcdMSC; /**< Binary coded decimal value, indicating the supported MIDI Class specification version.
+			                  *
+			                  *   \see \ref VERSION_BCD() utility macro.
+			                  */
 			uint16_t wTotalLength; /**< Total length of the Audio class-specific descriptors, including this descriptor. */
 		} ATTR_PACKED USB_MIDI_StdDescriptor_AudioInterface_AS_t;
 
