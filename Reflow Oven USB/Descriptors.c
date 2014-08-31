@@ -203,7 +203,7 @@ const USB_Descriptor_String_t PROGMEM LanguageString =
  */
 const USB_Descriptor_String_t PROGMEM ManufacturerString =
 {
-	.Header                 = {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
+	.Header                 = {.Size = USB_STRING_LEN(30), .Type = DTYPE_String},
 
 	.UnicodeString          = L"ProAtomic Software Development"
 };
@@ -214,9 +214,9 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString =
  */
 const USB_Descriptor_String_t PROGMEM ProductString =
 {
-	.Header                 = {.Size = USB_STRING_LEN(13), .Type = DTYPE_String},
+	.Header                 = {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
 
-	.UnicodeString          = L"Reflow Oven Bootloader"
+	.UnicodeString          = L"Reflow Oven"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
