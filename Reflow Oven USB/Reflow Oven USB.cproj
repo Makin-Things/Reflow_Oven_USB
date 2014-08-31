@@ -289,9 +289,6 @@
     <None Include="eeprom.txt">
       <SubType>compile</SubType>
     </None>
-    <None Include="Reflow Oven USB.inf">
-      <SubType>compile</SubType>
-    </None>
     <None Include="Reflow Oven USB.txt">
       <SubType>compile</SubType>
     </None>
