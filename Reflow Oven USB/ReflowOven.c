@@ -57,6 +57,7 @@
 #include "lcd.h"
 #include "spi.h"
 #include "menu.h"
+#include "version.h"
 
 //==============================================================================================================================
 // Protect against initial watchdog timeouts
@@ -76,6 +77,8 @@ extern uint8_t CurrentMenuItemIdx;
 
 //==============================================================================================================================
 // Defines
+
+#define BUILD(x) #x
 
 #define OVEN_RELAY_SSR		PB4
 #define OVEN_RELAY_EMR		PB5
@@ -1143,8 +1146,8 @@ int main(void)
 	if (lcdPresent)
 	{
 	  lcd_clrscr (); // clear display and home cursor
-		lcd_puts_p (PSTR ("Reflow USB v1.00"));
-	}	
+		lcd_puts_p (PSTR ("Reflow USB v2."BUILD(build)));
+	}
 
 	for (;;)
 	{
