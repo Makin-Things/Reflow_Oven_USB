@@ -450,7 +450,9 @@ void SendOvenSettings(void)
 // Cleanup and jump into the bootloader
 
 void Bootloader(void)
-{	
+{
+	lcd_clrscr();
+	lcd_puts_P("Bootloader");
 	wdt_disable();
 	TIMSK1 = 0; // Disable TIMER1
 	USB_Detach();
@@ -1096,7 +1098,7 @@ uint8_t ReadButtons()
   buttons = tmpb;
   if (buttons)
   {
-		keybeep ();
+		keybeep();
   }		
 	return buttons;
 }
@@ -1109,7 +1111,7 @@ void SetIdleMode(void)
 	// set the title bar label and blank the DisplaySpace
 	//
 	lcd_clrscr();
-	lcd_puts_p(PSTR("Idle"));
+	lcd_puts_P("Idle");
 	showTemp = true;
 	//
 	// set the button bar and the event handler
@@ -1143,8 +1145,8 @@ int main(void)
 
 	if (lcdPresent)
 	{
-	  lcd_clrscr (); // clear display and home cursor
-		lcd_puts_p (PSTR ("Reflow Oven USB\nv2."buildstr));
+	  lcd_clrscr(); // clear display and home cursor
+		lcd_puts_P("Reflow Oven USB\nv2."buildstr);
 	}
 
 	for (;;)
@@ -1153,24 +1155,24 @@ int main(void)
 		{
 			if (lcdPresent)
 			{
-				lcd_clrscr (); // clear display and home cursor
+				lcd_clrscr(); // clear display and home cursor
 			}
 			// Check oven is calibrated
-			if (!eeprom_read_byte (&OvenCalibrated))
+			if (!eeprom_read_byte(&OvenCalibrated))
 			{
 				if (lcdPresent)
 				{
-					lcd_puts_p (PSTR ("Oven\nNot calibrated"));
+					lcd_puts_P("Oven\nNot calibrated");
 				}
 			}
 			else // read profiles
 			{
-				sprintf_P (tmpStr, PSTR("Profiles %02u/%02u"), 0, eeprom_read_byte(&ProfileCount));
+				sprintf_P(tmpStr, PSTR("Profiles %02u/%02u"), 0, eeprom_read_byte(&ProfileCount));
 				if (lcdPresent)
 				{
-					lcd_puts_p (PSTR ("Oven Calibrated"));
+					lcd_puts_P("Oven Calibrated");
 					lcd_gotoxy(0, 1);
-					lcd_puts (tmpStr);
+					lcd_puts(tmpStr);
 				}
 				tick++;
 			}
@@ -1179,7 +1181,7 @@ int main(void)
 		{
 			if (lcdPresent)
 			{
-			  lcd_clrscr (); // clear display and home cursor
+			  lcd_clrscr(); // clear display and home cursor
 			}
 			tick = 0;
 			break;
@@ -1195,7 +1197,7 @@ int main(void)
 	}
 
 	// Load the default profile
-	eeprom_read_block ((void*)&profile, (const void*)&Profiles[0], sizeof(__profile));
+	eeprom_read_block((void*)&profile, (const void*)&Profiles[0], sizeof(__profile));
 	
 	SetIdleMode();
 
