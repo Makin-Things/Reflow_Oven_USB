@@ -453,11 +453,12 @@ void Bootloader(void)
 {
 	lcd_clrscr();
 	lcd_puts_P("Bootloader");
-	wdt_disable();
+//	wdt_disable();
 	TIMSK1 = 0; // Disable TIMER1
 	USB_Detach();
 	_delay_ms(1000);
-	eeprom_write_byte(&ValidApp, 0xFF);
+	eeprom_write_byte(&ValidApp, 0xDD);
+	while (!eeprom_is_ready());
 	wdt_enable(WDTO_30MS);
 	for (;;);
 }
@@ -1063,6 +1064,9 @@ void keybeep (void)
 
 void ProcessPacket(char* packet)
 {
+	keybeep();
+	_delay_ms(50);
+	keybeep();
 	if (strcmp(packet, "**BOOT") == 0) // Command to enter the bootloader
 	{
 		Bootloader();
