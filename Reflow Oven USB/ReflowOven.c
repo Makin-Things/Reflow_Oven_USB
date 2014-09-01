@@ -24,10 +24,10 @@
 // B.6			Output		Spare output
 // B.7			Output		Spare output
 //
-// C.4			Input			Switch 0
-// C.5			Input			Switch 1
-// C.6			Input			Switch 2
-// C.7			Input			Switch 3
+// C.4			Input			Switch 1
+// C.5			Input			Switch 2
+// C.6			Input			Switch 3
+// C.7			Input			Switch 0
 //
 // D.0			Output		LCD DB4
 // D.1			Output		LCD DB5
