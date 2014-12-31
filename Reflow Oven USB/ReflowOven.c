@@ -226,11 +226,13 @@ uint16_t ovenTempArray[68];
 int16_t ovenDelta4;
 int16_t ovenDelta16;
 int16_t ovenDelta64;
-uint8_t deltaCount;
+uint8_t deltaCount = 0;
 uint8_t ovenStage; // Used to store where a task is up to
 uint16_t ovenCounter;
 void(*ProcessHandler)();
 uint16_t count = 0;
+uint16_t endCount = 3600;
+uint8_t endSet = 0;
 __profile profile;
 volatile uint8_t tick = 0;
 volatile uint8_t subtickCounter = 0;
@@ -318,11 +320,12 @@ uint8_t GetPacket(char* buf, uint8_t size)
 	if (CDC_Device_BytesReceived(&VirtualSerial_CDC_Interface))
 	{
 		fgets(buf, size, &USBSerialStream);
+//		printf("$$%s$$\n", buf);
 		while ((strlen(buf) > 0) && ((buf[strlen(buf)-1] == '\r') || (buf[strlen(buf)-1] == '\n')))
 		{
 			buf[strlen(buf)-1] = 0;
 		}
-		printf("##%s##\n", inBuf);
+//		printf("##%s##\n", inBuf);
 		return true;
 	}
 	
@@ -369,7 +372,7 @@ void UpdateTemp (void)
 	char str[20];
 
 	ovenTemp = spi_read ();
-	if (ovenTempArray == 0)
+	if (ovenTempArray[0] == 0)
 	{
 		for (uint8_t i = 0; i < 68; i++)
 		{
@@ -382,9 +385,9 @@ void UpdateTemp (void)
 		ovenTempArray[0] = ovenTemp;
 	}
 	
-	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[8]-ovenTempArray[10]-ovenTempArray[11]+8)>>4;
-	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+8)>>4;
-	ovenDelta64 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+8)>>4;
+	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]+4)>>3;
+	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+4)>>3;
+	ovenDelta64 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4)>>3;
 
 	if (lcdPresent)
 	{
@@ -458,7 +461,7 @@ void Bootloader(void)
 	TIMSK1 = 0; // Disable TIMER1
 	USB_Detach();
 	_delay_ms(1000);
-	eeprom_write_byte(&ValidApp, 0xDD);
+	eeprom_write_byte(&ValidApp, 0xFF);
 	while (!eeprom_is_ready());
 	wdt_enable(WDTO_30MS);
 	for (;;);
@@ -598,7 +601,7 @@ void RunProfileHandler()
 			}
 			else
 			{
-				set_duty_cycle(0); // no more heat for now
+				set_duty_cycle(3); // maintain the temp
 			}
 			if ((count-ovenCounter) >= (profile.reflow_time << 1))
 			{
@@ -934,11 +937,88 @@ void CalibrateOvenHandler()
 };
 */
 
+//==============================================================================================================================
+//
+
+uint8_t OCALStageDone(void)
+{
+	if ((ovenDelta64 == 0) && (count >= 600))
+	{
+		deltaCount++;
+		if ((deltaCount == 10) && (!endSet))
+		{
+			endCount = (count >= 1200) ? count+600 : 1800;
+			endSet = 1;
+		}
+	}
+	else
+	{
+		deltaCount = 0;
+	}
+	
+	if (count == endCount)
+	{
+		endCount = 3600;
+		endSet = 0;
+		deltaCount = 0;
+		return 1;
+	}
+	
+	return 0;
+}
+
+//==============================================================================================================================
+//
+
+void OCALIsDone(void)
+{
+	if (ovenTemp > 1000)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts_P("      ");
+		count = 0;
+		fprintf(&USBSerialStream, "=END\n");
+		set_duty_cycle(0); //Turn off the SSR
+		_delay_ms(25);
+		EMR_OFF;
+		isRunning = false;
+		ovenStage = 0;
+		endCount = 3600;
+		endSet = 0;
+		SetIdleMode();
+	}
+	else
+	{
+		set_duty_cycle(20); //Turn on the SSR at 100%
+		ovenStage++;
+	}
+
+}
+
+//==============================================================================================================================
+//
+
 void CalibrateOvenHandler()
 {
+	if (ovenTemp > 1080)
+	{
+		fprintf(&USBSerialStream, "=END\n");
+		set_duty_cycle(0); //Turn off the SSR
+		_delay_ms(25);
+		EMR_OFF;
+		isRunning = false;
+		ovenStage = 0;
+		endCount = 3600;
+		endSet = 0;
+		SetIdleMode();
+		return;
+	}
+	
 	switch (ovenStage)
 	{
 		case 0: // close door & start message
+			lcd_gotoxy(0, 0);
+			lcd_puts_P("Oven Cal ");
 			lcd_gotoxy(0, 1);
 			lcd_puts_P("Close door     ");
 			ovenStage++;
@@ -951,92 +1031,163 @@ void CalibrateOvenHandler()
 			}
 			break;
 
-		case 2: // 15%
+		case 2: // start 5%
 			fprintf (&USBSerialStream, "=OCAL\n");
 			lcd_gotoxy(0, 1);
-			lcd_puts_P("15%            ");
+			lcd_puts_P("5%            ");
 			count = 0;
 			EMR_ON; //Turn on the EMR
 			_delay_ms(25);
 			set_duty_cycle(20); //Turn on the SSR at 100%
-			deltaCount = 0;
+			endCount = 3600;
+			endSet = 0;
 			ovenStage++;
 			break;
-			
-		case 3: //  to 100c then 10%
-			if((tick) && (count == 60))
+
+		case 3: // to 5%
+			if (count == 6)
 			{
-				set_duty_cycle(3); // Turn on the SSR at 15%
+				set_duty_cycle(1); //Turn on the SSR at 5%
 			}
-							
-		  if ((tick) && (count >= 60) && (ovenDelta16 <= 1))
-		  {
-			  deltaCount++;
-		  }
-		  
-		  if (deltaCount == 8)
-		  {
+			if (OCALStageDone())
+			{
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("10%   ");
 				count = 0;
+				OCALIsDone();
+			}
+			break;
+
+		case 4: // to 10%
+			if (count == 50)
+			{
 				set_duty_cycle(2); //Turn on the SSR at 10%
-				ovenStage++;
-		  }			  
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("15%   ");
+				count = 0;
+				OCALIsDone();
+			}
 			break;
 			
-		case 4: // 10 minutes then 100%
-			if (count == 1200)
+		case 5: // to 15%
+			if (count == 45)
+			{
+				set_duty_cycle(3); //Turn on the SSR at 15%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("20%   ");
+				count = 0;
+				OCALIsDone();
+			}
+			break;
+
+		case 6: // to 20%
+			if (count == 40)
+			{
+				set_duty_cycle(4); //Turn on the SSR at 20%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("25%   ");
+				count = 0;
+				OCALIsDone();
+			}
+			break;
+			
+		case 7: // to 25%
+			if (count == 40)
+			{
+				set_duty_cycle(5); //Turn on the SSR at 25%
+			}
+			if (OCALStageDone())
 			{
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("30%   ");
 				count = 0;
-				set_duty_cycle(20); //Turn on the SSR at 100%
-				deltaCount = 0;
-				ovenStage++;
+				OCALIsDone();
 			}
 			break;
 
-		case 5: //  to 180c then 20%
-			if((tick) && (count == 60))
+		case 8: // to 30%
+			if (count == 40)
 			{
-				set_duty_cycle(6); // Turn on the SSR at 30%
+				set_duty_cycle(6); //Turn on the SSR at 30%
 			}
-
-		  if ((tick) && (count >= 60))
-		  {
-			  if ((duty_cycle == 6) && (ovenDelta16 <= 2))
-			  {
-				  deltaCount++;
-				  if (deltaCount == 8)
-				  {
-					  set_duty_cycle(5);
-					  deltaCount = 0;
-				  }					  
-			  }
-			  if ((duty_cycle == 5) && (ovenDelta16 <= 1))
-			  {
-				  deltaCount++;
-					if (deltaCount == 8)
-					{
-						lcd_gotoxy(0, 1);
-						lcd_puts_P("20%   ");
-						count = 0;
-						set_duty_cycle(4); //Turn on the SSR at 20%
-						ovenStage++;
-					}
-			  }				 
-		  }
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("35%   ");
+				count = 0;
+				OCALIsDone();
+			}
 			break;
 
-		case 6: // 10 minutes then off
-			if (count == 1200)
+		case 9: // to 35%
+			if (count == 40)
 			{
+				set_duty_cycle(7); //Turn on the SSR at 35%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("40%   ");
+				count = 0;
+				OCALIsDone();
+			}
+			break;
+
+		case 10: // to 40%
+			if (count == 40)
+			{
+				set_duty_cycle(8); //Turn on the SSR at 40%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("45%   ");
+				count = 0;
+				OCALIsDone();
+			}
+			break;
+
+		case 11: // to 45%
+			if (count == 40)
+			{
+				set_duty_cycle(9); //Turn on the SSR at 45%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("50%   ");
+				count = 0;
+				OCALIsDone();
+			}
+			break;
+
+		case 12: // to 50%
+			if (count == 40)
+			{
+				set_duty_cycle(10); //Turn on the SSR at 50%
+			}
+			if (OCALStageDone())
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("      ");
+				count = 0;
 				fprintf(&USBSerialStream, "=END\n");
 				set_duty_cycle(0); //Turn off the SSR
 				_delay_ms(25);
 				EMR_OFF;
 				isRunning = false;
 				ovenStage = 0;
+				endCount = 3600;
+				endSet = 0;
 				SetIdleMode();
 			}
 			break;
@@ -1065,9 +1216,6 @@ void keybeep (void)
 
 void ProcessPacket(char* packet)
 {
-	keybeep();
-	_delay_ms(50);
-	keybeep();
 	if (strcmp(packet, "**BOOT") == 0) // Command to enter the bootloader
 	{
 		Bootloader();
@@ -1240,7 +1388,7 @@ int main(void)
 		{
 			tick = 0;
 		}
-		
+
 		if (GetPacket(inBuf, sizeof(inBuf))) // Check if there is incoming USB data
 		{
 			ProcessPacket(inBuf);
