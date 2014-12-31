@@ -114,6 +114,7 @@ uint8_t EEMEM ProfileCount = 2;
 __profile EEMEM Profiles[MAX_PROFILES] = 
 {
 	{"Default         ",1,150,8,180,90,215,131,206},			//perfect for leaded solder
+	{"Bigger Board    ",1,150,12,180,120,220,138,212},
 	{"Leadfree        ",1,150,12,200,120,255,138,248} 
 };
 
