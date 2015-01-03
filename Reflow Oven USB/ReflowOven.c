@@ -227,7 +227,7 @@ uint16_t ovenTemp;
 uint16_t ovenTempArray[68];
 int16_t ovenDelta4;
 int16_t ovenDelta16;
-int16_t ovenDelta64;
+int16_t ovenDelta32;
 uint8_t deltaCount = 0;
 uint8_t ovenStage; // Used to store where a task is up to
 uint16_t ovenCounter;
@@ -389,7 +389,7 @@ void UpdateTemp (void)
 	
 	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]+4)>>3;
 	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+4)>>3;
-	ovenDelta64 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4)>>3;
+	ovenDelta32 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4)>>3;
 
 	if (lcdPresent)
 	{
@@ -426,7 +426,7 @@ void UpdateTemp (void)
 		{
 			lcd_puts (str);
 		}
-		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u,%d,%d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta64);
+		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u,%d,%d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta32);
 	}
 
 	count++;
@@ -944,7 +944,7 @@ void CalibrateOvenHandler()
 
 uint8_t OCALStageDone(void)
 {
-	if ((ovenDelta64 == 0) && (count >= 600))
+	if ((ovenDelta32 == 0) && (count >= 600))
 	{
 		deltaCount++;
 		if ((deltaCount == 10) && (!endSet))
