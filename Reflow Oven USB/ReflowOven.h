@@ -37,6 +37,8 @@
 	void CalibrateOvenCommand(void);
 	void CalibrateOvenHandler(void);
 	void CalibrateProfileCommand(void);
+	void Calibrate120cCommand(void);
+	void Calibrate120cHandler(void);
 	void keybeep (void);
 	void ProcessPacket(char*);
 	uint8_t ReadButtons(void);

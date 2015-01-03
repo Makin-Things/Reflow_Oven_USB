@@ -109,12 +109,12 @@ typedef struct
 uint8_t __attribute__((section(".validapp"))) ValidApp = 0xBB;
 
 uint8_t EEMEM OvenCalibrated = 1;
-uint8_t EEMEM ProfileCount = 2;
+uint8_t EEMEM ProfileCount = 3;
 
 __profile EEMEM Profiles[MAX_PROFILES] = 
 {
 	{"Default         ",1,150,8,180,90,215,131,206},			//perfect for leaded solder
-	{"Bigger Board    ",1,150,6,180,120,220,138,212},
+	{"Bigger Board    ",1,150,6,180,90,220,138,206},
 	{"Leadfree        ",1,150,12,200,120,255,138,248} 
 };
 
@@ -169,12 +169,14 @@ const MENU_ITEM SelectProfileMenu[] PROGMEM =
 const char Str20[] PROGMEM = "Settings        ";
 const char Str21[] PROGMEM = "Calib. Oven     ";
 const char Str22[] PROGMEM = "Calib. Profile  ";
+const char Str23[] PROGMEM = "Calib. 120c     ";
 
 const MENU_ITEM SettingsMenu[] PROGMEM =
 {
 	{MENU_ITEM_TYPE_SUB_MENU_HEADER, Str20, (PGM_P)MainMenu},
 	{MENU_ITEM_TYPE_COMMAND, Str21, (PGM_P)CalibrateOvenCommand},
 	{MENU_ITEM_TYPE_COMMAND, Str22, (PGM_P)CalibrateProfileCommand},
+	{MENU_ITEM_TYPE_COMMAND, Str23, (PGM_P)Calibrate120cCommand},
 	{MENU_ITEM_TYPE_END_OF_MENU, NULL, 0}
 };
 
@@ -595,7 +597,7 @@ void RunProfileHandler()
 			break;
 
 		case 7:
-			if ((ovenTemp >> 2) <= profile.reflow_cutoff)
+			if ((ovenTemp >> 2) < profile.reflow_temp-1)
 			{
 				set_duty_cycle(4); // just a touch more heat
 			}
@@ -1199,6 +1201,90 @@ void CalibrateOvenHandler()
 	
 void CalibrateProfileCommand()
 {
+};
+
+//==============================================================================================================================
+//
+
+void Calibrate120cCommand()
+{
+	lcd_gotoxy(0, 1);
+	lcd_puts_P("                ");
+	showTemp = true;
+	ovenStage = 0;
+	count = 0;
+	ProcessHandler = Calibrate120cHandler;
+	isRunning = true;
+};
+
+//==============================================================================================================================
+//
+
+void Calibrate120cHandler()
+{
+	if (ovenTemp > 1080)
+	{
+		fprintf(&USBSerialStream, "=END\n");
+		set_duty_cycle(0); //Turn off the SSR
+		_delay_ms(25);
+		EMR_OFF;
+		isRunning = false;
+		ovenStage = 0;
+		endCount = 3600;
+		endSet = 0;
+		SetIdleMode();
+		return;
+	}
+	
+	switch (ovenStage)
+	{
+		case 0: // close door & start message
+			lcd_gotoxy(0, 0);
+			lcd_puts_P("Oven 120c");
+			lcd_gotoxy(0, 1);
+			lcd_puts_P("Close door     ");
+			ovenStage++;
+			break;
+
+		case 1: // wait for button press
+			if ((newButton) && (buttons == EVENT_ENTER_BUTTON_PUSHED))
+			{
+				ovenStage++;
+			}
+			break;
+
+		case 2: // start 100%
+			fprintf (&USBSerialStream, "=O120\n");
+			lcd_gotoxy(0, 1);
+			lcd_puts_P("100%          ");
+			count = 0;
+			EMR_ON; //Turn on the EMR
+			_delay_ms(25);
+			set_duty_cycle(20); //Turn on the SSR at 100%
+			ovenStage++;
+			break;
+
+		case 3: // to 120c
+			if (ovenTemp >= 480) //120c
+			{
+				set_duty_cycle(0); //Turn on the SSR at 5%
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("120c cutoff");
+				ovenStage++;
+			}
+			break;
+
+		case 4: // wait for delta4 to get to 0
+			if (ovenDelta4 <= 0)
+			{
+				EMR_OFF;
+				isRunning = false;
+				ovenStage = 0;
+				fprintf(&USBSerialStream, "=END\n");
+				SetIdleMode();
+			}
+			break;
+	}
 };
 
 //==============================================================================================================================
