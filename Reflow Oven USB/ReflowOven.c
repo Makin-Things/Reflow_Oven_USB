@@ -224,6 +224,7 @@ bool usbConnected = false;
 bool isRunning = false;
 bool showTemp = true;
 uint16_t ovenTemp;
+uint16_t ovenEndTemp;
 uint16_t ovenTempArray[68];
 int16_t ovenDelta4;
 int16_t ovenDelta16;
@@ -1047,7 +1048,7 @@ void CalibrateOvenHandler()
 			break;
 
 		case 3: // to 5%
-			if (count == 6)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
 			{
 				set_duty_cycle(1); //Turn on the SSR at 5%
 			}
@@ -1061,7 +1062,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 4: // to 10%
-			if (count == 50)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 50)
 			{
 				set_duty_cycle(2); //Turn on the SSR at 10%
 			}
@@ -1075,7 +1077,8 @@ void CalibrateOvenHandler()
 			break;
 			
 		case 5: // to 15%
-			if (count == 45)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 45)
 			{
 				set_duty_cycle(3); //Turn on the SSR at 15%
 			}
@@ -1089,7 +1092,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 6: // to 20%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(4); //Turn on the SSR at 20%
 			}
@@ -1103,7 +1107,8 @@ void CalibrateOvenHandler()
 			break;
 			
 		case 7: // to 25%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(5); //Turn on the SSR at 25%
 			}
@@ -1117,7 +1122,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 8: // to 30%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(6); //Turn on the SSR at 30%
 			}
@@ -1131,7 +1137,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 9: // to 35%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(7); //Turn on the SSR at 35%
 			}
@@ -1145,7 +1152,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 10: // to 40%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(8); //Turn on the SSR at 40%
 			}
@@ -1159,7 +1167,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 11: // to 45%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(9); //Turn on the SSR at 45%
 			}
@@ -1173,7 +1182,8 @@ void CalibrateOvenHandler()
 			break;
 
 		case 12: // to 50%
-			if (count == 40)
+			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+//			if (count == 40)
 			{
 				set_duty_cycle(10); //Turn on the SSR at 50%
 			}
@@ -1230,8 +1240,6 @@ void Calibrate120cHandler()
 		EMR_OFF;
 		isRunning = false;
 		ovenStage = 0;
-		endCount = 3600;
-		endSet = 0;
 		SetIdleMode();
 		return;
 	}
@@ -1260,21 +1268,33 @@ void Calibrate120cHandler()
 			count = 0;
 			EMR_ON; //Turn on the EMR
 			_delay_ms(25);
-			set_duty_cycle(20); //Turn on the SSR at 100%
+			set_duty_cycle(4); //Turn on the SSR at 100%
 			ovenStage++;
 			break;
+			
+		case 3: // to 100c
+			if (ovenTemp >= 400) //100c
+			{
+				lcd_gotoxy(0, 1);
+				lcd_puts_P("100% @100c    ");
+				endCount = count;
+				ovenStage++;
+			}
+			break;			
 
-		case 3: // to 120c
+		case 4: // to 120c
 			if (ovenTemp >= 480) //120c
 			{
 				set_duty_cycle(0); //Turn on the SSR at 5%
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("120c cutoff");
+				endCount = count-endCount;
+				ovenEndTemp = ovenTemp;
 				ovenStage++;
 			}
 			break;
 
-		case 4: // wait for delta4 to get to 0
+		case 5: // wait for delta4 to get to 0
 			if (ovenDelta4 <= 0)
 			{
 				EMR_OFF;
