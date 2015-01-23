@@ -48,6 +48,7 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "Descriptors.h"
 #include "../LUFA/LUFA/Version.h"
@@ -96,6 +97,8 @@ typedef struct
 	unsigned char calibrated;
 	unsigned char preheat_temp;
 	unsigned char soak_dutycycle;
+	unsigned char soak_rate;
+	unsigned char soak_time;
 	unsigned char soak_temp;
 	unsigned char reflow_time;
 	unsigned char reflow_temp;
@@ -113,9 +116,9 @@ uint8_t EEMEM ProfileCount = 3;
 
 __profile EEMEM Profiles[MAX_PROFILES] = 
 {
-	{"Default         ",1,150,8,180,90,215,131,206},			//perfect for leaded solder
-	{"Bigger Board    ",1,150,6,180,90,220,138,206},
-	{"Leadfree        ",1,150,12,200,120,255,138,248} 
+	{"Default         ",1,150,8,8,60,180,60,215,131,206},			  // for small low density boards
+	{"Bigger Board    ",1,150,6,8,120,180,90,220,138,206},			// for larger high density boards
+	{"Leadfree        ",1,150,12,8,120,200,120,255,138,248} 
 };
 
 //__profile EEMEM Profiles[MAX_PROFILES] = {{"Leadfree",1,150,3,2,200,120,255,138,248}}; //perfect for leaded solder
@@ -124,6 +127,7 @@ __profile EEMEM Profiles[MAX_PROFILES] =
 // 210 reflow __profile EEMEM Profiles[MAX_PROFILES] = {{"Default",1,150,2,4,180,90,210,123,199}};
 
 uint8_t EEMEM TempCounts[20] = {18,14,14,15,11,10,11,11,10,12,11,12,12,11,12,13,18,15,16,16};
+uint16_t EEMEM FinalTemps[20] = {77,117,153,185,213,237,257,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 //==============================================================================================================================
 // PROGMEM Menu definition
@@ -232,6 +236,7 @@ int16_t ovenDelta32;
 uint8_t deltaCount = 0;
 uint8_t ovenStage; // Used to store where a task is up to
 uint16_t ovenCounter;
+int16_t ovenError = 0;
 void(*ProcessHandler)();
 uint16_t count = 0;
 uint16_t endCount = 3600;
@@ -388,9 +393,9 @@ void UpdateTemp (void)
 		ovenTempArray[0] = ovenTemp;
 	}
 	
-	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]+4)>>3;
-	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+4)>>3;
-	ovenDelta32 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4)>>3;
+	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]+4);
+	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+4);
+	ovenDelta32 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4);
 
 	if (lcdPresent)
 	{
@@ -399,7 +404,7 @@ void UpdateTemp (void)
 
 	if (ovenTemp >= 65533)
 	{
-	  set_duty_cycle(0); //Turn off SSR
+	  setDutyCycle(0); //Turn off SSR
 	  _delay_ms(25); //Wait for SSR to power down
 	  EMR_OFF; // Turn off EMR
 		if (ovenTemp == 65535)
@@ -427,7 +432,7 @@ void UpdateTemp (void)
 		{
 			lcd_puts (str);
 		}
-		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u,%d,%d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta32);
+		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u,%d,%d,%d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta32,ovenError);
 	}
 
 	count++;
@@ -473,7 +478,7 @@ void Bootloader(void)
 //==============================================================================================================================
 //
 
-void set_duty_cycle (uint8_t ratio)
+void setDutyCycle (uint8_t ratio)
 {
 	duty_cycle = ratio;
 	if (duty_cycle == 0)
@@ -484,6 +489,23 @@ void set_duty_cycle (uint8_t ratio)
 	{
 		SSR_ON;
 	}
+}
+
+//==============================================================================================================================
+//
+
+uint8_t getDutyCycle(uint16_t temp)
+{
+	uint8_t i;
+	
+	for (i = 0; i < 20; i++)
+	{
+		if (temp <= eeprom_read_word(&FinalTemps[i]))
+		{
+			return i+1;
+		}
+	}
+	return 0;
 }
 
 //==============================================================================================================================
@@ -519,7 +541,7 @@ void RunProfileHandler()
 	{
 		case 0: // close door & start message
 			lcd_gotoxy(0, 1);
-			lcd_puts_P("Close door     ");
+			lcd_puts_P("Close door      ");
 			ovenStage++;
 			break;
 
@@ -533,84 +555,94 @@ void RunProfileHandler()
 		case 2: // Preheat
 			printProfile(); // Send the profile we are about to run to the serial port
 			lcd_gotoxy(0, 1);
-			lcd_puts_P("Preheat        ");
+			lcd_puts_P("Preheat         ");
 			count = 0;
 			EMR_ON; //Turn on the EMR
 			_delay_ms(25);
-			set_duty_cycle(20); //Turn on the SSR
+			setDutyCycle(20); //Turn on the SSR
 			ovenStage++;
 			break;
 
 		case 3: // Reached preheat cutoff
-			if ((ovenTemp >> 2) >= profile.preheat_cutoff)
+//			if ((ovenTemp >> 2) >= profile.preheat_cutoff)
+			if ((ovenTemp) >= ((profile.preheat_temp << 2) - ovenDelta4))
 			{
 				lcd_gotoxy(0, 1);
-				lcd_puts_P("Preheat cutoff   ");
-				set_duty_cycle(0); //Turn off the SSR
-				ovenCounter = 3 * eeprom_read_byte(&TempCounts[9]);
+				lcd_puts_P("Preheat cutoff  ");
+				setDutyCycle(getDutyCycle(profile.preheat_temp)-1); //Reduce the output power
 				ovenStage++;
 			}
 			break;
 
-		case 4: // Wait for overshoot timeout
-			if (tick)
+		case 4: // Wait for the oven to reach the preheat temp
+			if ((ovenTemp >> 2) >= profile.preheat_temp)
 			{
-				ovenCounter--;
-			}				
-
-			if (!ovenCounter)
-			{
-				char str[17];
-				set_duty_cycle(profile.soak_dutycycle);
-				sprintf_P(str, PSTR("Duty cycle %3u%%"), profile.soak_dutycycle*5);
 				lcd_gotoxy(0, 1);
-				lcd_puts(str);
+				lcd_puts("Soak            ");
+				ovenCounter = 0;
 				ovenStage++;
 			}
 			break;
 
 		case 5:
+			if (tick)
+			{
+				ovenCounter++;
+				ovenError = (int16_t)(ovenTemp-(((uint16_t)(profile.preheat_temp) << 2)+(((uint16_t)profile.soak_temp-(uint16_t)profile.preheat_temp) << 2)*((float)(ovenCounter)/((uint16_t)profile.soak_time << 1))));
+				
+				if (ovenError > 8) // rate to high, reduce duty cycle
+				{
+					setDutyCycle(getDutyCycle(profile.soak_temp));
+				}
+				else
+				{
+					setDutyCycle(getDutyCycle(profile.soak_temp)+abs(ovenError-12)/4);
+				}
+			}
+
 			if ((ovenTemp >> 2) >= profile.soak_temp)
 			{
-				set_duty_cycle(20);
+				setDutyCycle(20);
 				lcd_gotoxy(0, 1);
-				lcd_puts_P("Reflow         ");
+				lcd_puts_P("Reflow          ");
 				ovenCounter = count;
+				ovenError = 0;
 				ovenStage++;
 			}
-			else
+/*			else
 			{
 				if ((ovenTemp >> 2) <= profile.preheat_temp)
 				{
 					ovenCounter = count;
 				}
-			}
+			} */
 			break;
 
 		case 6: // Reached reflow cutoff
-			if ((ovenTemp >> 2) >= profile.reflow_cutoff)
+//			if ((ovenTemp >> 2) >= profile.reflow_cutoff)
+			if ((ovenTemp) >= ((profile.reflow_temp << 2) - (uint16_t)((float)(ovenDelta4)*0.9)))
 			{
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("Reflow cutoff ");
-				set_duty_cycle(0);
+				setDutyCycle(0);
 				ovenStage++;
 			}
 			break;
 
 		case 7:
-			if ((ovenTemp >> 2) < profile.reflow_temp-1)
+/*			if ((ovenTemp >> 2) < profile.reflow_temp-1)
 			{
-				set_duty_cycle(4); // just a touch more heat
+				setDutyCycle(getDutyCycle(profile.reflow_temp)); // just a touch more heat
 			}
 			else
 			{
-				set_duty_cycle(3); // maintain the temp
-			}
+				setDutyCycle(getDutyCycle(profile.reflow_temp)-1); // maintain the temp
+			} */
 			if ((count-ovenCounter) >= (profile.reflow_time << 1))
 			{
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("Open door    ");
-				set_duty_cycle(0); // turn the heat off
+				setDutyCycle(0); // turn the heat off
 				_delay_ms(25);
 				EMR_OFF;
 				ovenStage++;
@@ -641,7 +673,7 @@ void RunProfileHandler()
 			break;
 
 		case 9:
-			if ((ovenTemp >> 2) < 100)
+			if ((ovenTemp >> 2) < 150)
 			{
 				fprintf(&USBSerialStream, "=END\n");
 				isRunning = false;
@@ -981,7 +1013,7 @@ void OCALIsDone(void)
 		lcd_puts_P("      ");
 		count = 0;
 		fprintf(&USBSerialStream, "=END\n");
-		set_duty_cycle(0); //Turn off the SSR
+		setDutyCycle(0); //Turn off the SSR
 		_delay_ms(25);
 		EMR_OFF;
 		isRunning = false;
@@ -992,7 +1024,7 @@ void OCALIsDone(void)
 	}
 	else
 	{
-		set_duty_cycle(20); //Turn on the SSR at 100%
+		setDutyCycle(20); //Turn on the SSR at 100%
 		ovenStage++;
 	}
 
@@ -1006,7 +1038,7 @@ void CalibrateOvenHandler()
 	if (ovenTemp > 1080)
 	{
 		fprintf(&USBSerialStream, "=END\n");
-		set_duty_cycle(0); //Turn off the SSR
+		setDutyCycle(0); //Turn off the SSR
 		_delay_ms(25);
 		EMR_OFF;
 		isRunning = false;
@@ -1041,16 +1073,16 @@ void CalibrateOvenHandler()
 			count = 0;
 			EMR_ON; //Turn on the EMR
 			_delay_ms(25);
-			set_duty_cycle(20); //Turn on the SSR at 100%
+			setDutyCycle(20); //Turn on the SSR at 100%
 			endCount = 3600;
 			endSet = 0;
 			ovenStage++;
 			break;
 
 		case 3: // to 5%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 			{
-				set_duty_cycle(1); //Turn on the SSR at 5%
+				setDutyCycle(1); //Turn on the SSR at 5%
 			}
 			if (OCALStageDone())
 			{
@@ -1062,10 +1094,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 4: // to 10%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 50)
 			{
-				set_duty_cycle(2); //Turn on the SSR at 10%
+				setDutyCycle(2); //Turn on the SSR at 10%
 			}
 			if (OCALStageDone())
 			{
@@ -1077,10 +1109,10 @@ void CalibrateOvenHandler()
 			break;
 			
 		case 5: // to 15%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 45)
 			{
-				set_duty_cycle(3); //Turn on the SSR at 15%
+				setDutyCycle(3); //Turn on the SSR at 15%
 			}
 			if (OCALStageDone())
 			{
@@ -1092,10 +1124,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 6: // to 20%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(4); //Turn on the SSR at 20%
+				setDutyCycle(4); //Turn on the SSR at 20%
 			}
 			if (OCALStageDone())
 			{
@@ -1107,10 +1139,10 @@ void CalibrateOvenHandler()
 			break;
 			
 		case 7: // to 25%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(5); //Turn on the SSR at 25%
+				setDutyCycle(5); //Turn on the SSR at 25%
 			}
 			if (OCALStageDone())
 			{
@@ -1122,10 +1154,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 8: // to 30%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(6); //Turn on the SSR at 30%
+				setDutyCycle(6); //Turn on the SSR at 30%
 			}
 			if (OCALStageDone())
 			{
@@ -1137,10 +1169,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 9: // to 35%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(7); //Turn on the SSR at 35%
+				setDutyCycle(7); //Turn on the SSR at 35%
 			}
 			if (OCALStageDone())
 			{
@@ -1152,10 +1184,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 10: // to 40%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(8); //Turn on the SSR at 40%
+				setDutyCycle(8); //Turn on the SSR at 40%
 			}
 			if (OCALStageDone())
 			{
@@ -1167,10 +1199,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 11: // to 45%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(9); //Turn on the SSR at 45%
+				setDutyCycle(9); //Turn on the SSR at 45%
 			}
 			if (OCALStageDone())
 			{
@@ -1182,10 +1214,10 @@ void CalibrateOvenHandler()
 			break;
 
 		case 12: // to 50%
-			if ((duty_cycle == 20) && (ovenDelta4 >= 7))
+			if ((duty_cycle == 20) && (ovenDelta4 >= 63))
 //			if (count == 40)
 			{
-				set_duty_cycle(10); //Turn on the SSR at 50%
+				setDutyCycle(10); //Turn on the SSR at 50%
 			}
 			if (OCALStageDone())
 			{
@@ -1193,7 +1225,7 @@ void CalibrateOvenHandler()
 				lcd_puts_P("      ");
 				count = 0;
 				fprintf(&USBSerialStream, "=END\n");
-				set_duty_cycle(0); //Turn off the SSR
+				setDutyCycle(0); //Turn off the SSR
 				_delay_ms(25);
 				EMR_OFF;
 				isRunning = false;
@@ -1235,7 +1267,7 @@ void Calibrate120cHandler()
 	if (ovenTemp > 1080)
 	{
 		fprintf(&USBSerialStream, "=END\n");
-		set_duty_cycle(0); //Turn off the SSR
+		setDutyCycle(0); //Turn off the SSR
 		_delay_ms(25);
 		EMR_OFF;
 		isRunning = false;
@@ -1268,7 +1300,7 @@ void Calibrate120cHandler()
 			count = 0;
 			EMR_ON; //Turn on the EMR
 			_delay_ms(25);
-			set_duty_cycle(4); //Turn on the SSR at 100%
+			setDutyCycle(4); //Turn on the SSR at 100%
 			ovenStage++;
 			break;
 			
@@ -1285,7 +1317,7 @@ void Calibrate120cHandler()
 		case 4: // to 120c
 			if (ovenTemp >= 480) //120c
 			{
-				set_duty_cycle(0); //Turn on the SSR at 5%
+				setDutyCycle(0); //Turn on the SSR at 5%
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("120c cutoff");
 				endCount = count-endCount;
@@ -1466,7 +1498,7 @@ int main(void)
 		{
 			if ((buttons == EVENT_MENU_BUTTON_PUSHED) && (isRunning)) // Turn the oven off and go back to idle
 			{ 
-				set_duty_cycle(0); //Turn off the SSR
+				setDutyCycle(0); //Turn off the SSR
 				_delay_ms(25);
 				EMR_OFF; //Turn off the EMR
 				fprintf(&USBSerialStream, "=ABORT\n");

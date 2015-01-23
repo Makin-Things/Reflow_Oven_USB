@@ -28,7 +28,8 @@
 	void UpdateTemp(void);
 	void SendOvenSettings(void);
 	void Bootloader(void);
-	void set_duty_cycle (uint8_t);
+	void setDutyCycle (uint8_t);
+	uint8_t getDutyCycle(uint16_t);
 	void printProfile (void);
 	void RunProfileCommand(void);
 	void RunProfileHandler(void);
