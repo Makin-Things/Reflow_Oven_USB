@@ -135,7 +135,7 @@
 		 *
 		 *  \return Constructed MIDI event ID.
 		 */
-		#define MIDI_EVENT(virtualcable, command)  ((virtualcable << 4) | (command >> 4))
+		#define MIDI_EVENT(virtualcable, command)  (((virtualcable) << 4) | ((command) >> 4))
 
 	/* Enums: */
 		/** Enum for the possible MIDI jack types in a MIDI device jack descriptor. */
@@ -345,7 +345,7 @@
 		 */
 		typedef struct
 		{
-			uint8_t Event; /**< MIDI event type, constructed with the \ref MIDI_EVENT() macro. */
+			uint8_t  Event; /**< MIDI event type, constructed with the \ref MIDI_EVENT() macro. */
 
 			uint8_t  Data1; /**< First byte of data in the MIDI event. */
 			uint8_t  Data2; /**< Second byte of data in the MIDI event. */

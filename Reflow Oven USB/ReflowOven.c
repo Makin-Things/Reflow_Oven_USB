@@ -117,7 +117,7 @@ uint8_t EEMEM ProfileCount = 3;
 __profile EEMEM Profiles[MAX_PROFILES] = 
 {
 	{"Default         ",1,150,8,8,60,180,60,215,131,206},			  // for small low density boards
-	{"Bigger Board    ",1,150,6,8,120,180,90,220,138,206},			// for larger high density boards
+	{"Bigger Board    ",1,150,6,8,120,180,90,215,138,206},			// for larger high density boards
 	{"Leadfree        ",1,150,12,8,120,200,120,255,138,248} 
 };
 
@@ -230,9 +230,11 @@ bool showTemp = true;
 uint16_t ovenTemp;
 uint16_t ovenEndTemp;
 uint16_t ovenTempArray[68];
+uint16_t ovenDelta4Array[12] = {0xFFFF};
 int16_t ovenDelta4;
 int16_t ovenDelta16;
 int16_t ovenDelta32;
+int16_t ovenRateOfChange;
 uint8_t deltaCount = 0;
 uint8_t ovenStage; // Used to store where a task is up to
 uint16_t ovenCounter;
@@ -393,9 +395,24 @@ void UpdateTemp (void)
 		ovenTempArray[0] = ovenTemp;
 	}
 	
-	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]+4);
-	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]+4);
-	ovenDelta32 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]+4);
+	ovenDelta4 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[8]-ovenTempArray[9]-ovenTempArray[10]-ovenTempArray[11]);
+	ovenDelta16 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[32]-ovenTempArray[33]-ovenTempArray[34]-ovenTempArray[35]);
+	ovenDelta32 = (int16_t)(ovenTempArray[0]+ovenTempArray[1]+ovenTempArray[2]+ovenTempArray[3]-ovenTempArray[64]-ovenTempArray[65]-ovenTempArray[66]-ovenTempArray[67]);
+
+	if (ovenDelta4Array[0] == 0xFFFF)
+	{
+		for (uint8_t i = 0; i < 12; i++)
+		{
+			ovenDelta4Array[i] = ovenDelta4;
+		}
+	}
+	else
+	{
+		memmove(&ovenDelta4Array[1], &ovenDelta4Array[0], sizeof(uint16_t)*11);
+		ovenDelta4Array[0] = ovenDelta4;
+	}
+	
+	ovenRateOfChange = (int16_t)(ovenDelta4Array[0]+ovenDelta4Array[1]+ovenDelta4Array[2]+ovenDelta4Array[3]-ovenDelta4Array[8]-ovenDelta4Array[9]-ovenDelta4Array[10]-ovenDelta4Array[11]);
 
 	if (lcdPresent)
 	{
@@ -432,7 +449,7 @@ void UpdateTemp (void)
 		{
 			lcd_puts (str);
 		}
-		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u,%d,%d,%d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta32,ovenError);
+		fprintf_P (&USBSerialStream, PSTR("%u,%u,%s,%u, %d,%d,%d, %d,%d\n"), ovenStage, count, str, duty_cycle, ovenDelta4, ovenDelta16, ovenDelta32, ovenRateOfChange, ovenError);
 	}
 
 	count++;
@@ -598,16 +615,16 @@ void RunProfileHandler()
 				{
 					setDutyCycle(getDutyCycle(profile.soak_temp)+abs(ovenError-12)/4);
 				}
-			}
 
-			if ((ovenTemp >> 2) >= profile.soak_temp)
-			{
-				setDutyCycle(20);
-				lcd_gotoxy(0, 1);
-				lcd_puts_P("Reflow          ");
-				ovenCounter = count;
-				ovenError = 0;
-				ovenStage++;
+				if ((ovenTemp >> 2) >= profile.soak_temp)
+				{
+					setDutyCycle(20);
+					lcd_gotoxy(0, 1);
+					lcd_puts_P("Reflow          ");
+					ovenCounter = count;
+					ovenError = 0;
+					ovenStage++;
+				}
 			}
 /*			else
 			{
@@ -620,7 +637,8 @@ void RunProfileHandler()
 
 		case 6: // Reached reflow cutoff
 //			if ((ovenTemp >> 2) >= profile.reflow_cutoff)
-			if ((ovenTemp) >= ((profile.reflow_temp << 2) - (uint16_t)((float)(ovenDelta4)*0.9)))
+
+			if ((ovenTemp) >= ((profile.reflow_temp << 2) - (uint16_t)((float)(ovenDelta4)*0.8)))
 			{
 				lcd_gotoxy(0, 1);
 				lcd_puts_P("Reflow cutoff ");
@@ -629,28 +647,43 @@ void RunProfileHandler()
 			}
 			break;
 
-		case 7:
-/*			if ((ovenTemp >> 2) < profile.reflow_temp-1)
-			{
-				setDutyCycle(getDutyCycle(profile.reflow_temp)); // just a touch more heat
-			}
-			else
-			{
-				setDutyCycle(getDutyCycle(profile.reflow_temp)-1); // maintain the temp
-			} */
-			if ((count-ovenCounter) >= (profile.reflow_time << 1))
+		case 7: // Wait for the oven to settle
+			if (ovenDelta4 <= 32)
 			{
 				lcd_gotoxy(0, 1);
-				lcd_puts_P("Open door    ");
-				setDutyCycle(0); // turn the heat off
-				_delay_ms(25);
-				EMR_OFF;
+				lcd_puts_P("Dwell         ");
 				ovenStage++;
-				ovenCounter = 0;
 			}
 			break;
 
-		case 8:
+		case 8: // Dwell
+			if (tick)
+			{
+				ovenError = (int16_t)(ovenTemp-((uint16_t)(profile.reflow_temp) << 2));
+
+				if (ovenTemp >= (profile.reflow_temp << 2)) // rate to high, reduce duty cycle
+				{
+					setDutyCycle(5);
+				}
+				else
+				{
+					setDutyCycle(getDutyCycle(profile.reflow_temp)-1+abs(ovenError)/4);
+				}
+		
+				if ((count-ovenCounter) >= (profile.reflow_time << 1))
+				{
+					lcd_gotoxy(0, 1);
+					lcd_puts_P("Open door    ");
+					setDutyCycle(0); // turn the heat off
+					_delay_ms(25);
+					EMR_OFF;
+					ovenStage++;
+					ovenCounter = 0;
+				}
+			}
+			break;
+
+		case 9:
 		  if (tick)
 		  {
 				if (ovenCounter < 20)
@@ -672,7 +705,7 @@ void RunProfileHandler()
 		  }				
 			break;
 
-		case 9:
+		case 10:
 			if ((ovenTemp >> 2) < 150)
 			{
 				fprintf(&USBSerialStream, "=END\n");
