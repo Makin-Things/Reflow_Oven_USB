@@ -37,7 +37,11 @@
 	void EditProfileCommand(void);
 	void CalibrateOvenCommand(void);
 	void CalibrateOvenHandler(void);
+	void PIDTestCommand(void);
+	void PIDTestHandler(void);
 	void CalibrateProfileCommand(void);
+	void Calibrate60cCommand(void);
+	void Calibrate60cHandler(void);
 	void Calibrate120cCommand(void);
 	void Calibrate120cHandler(void);
 	void keybeep (void);

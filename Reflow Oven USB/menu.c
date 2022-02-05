@@ -164,7 +164,9 @@ static void MenuDisplayEventHandler(uint8_t Event)
 			{
 				CommandPntr = (void (*)(void))pgm_read_word(&CurrentMenuTable[1].MenuItemPntr);
 				if (CommandPntr != 0)
-					(*CommandPntr)(); 
+				{
+					(*CommandPntr)();
+				}
 			}				
 			break;
 
@@ -181,7 +183,8 @@ static void MenuDisplayEventHandler(uint8_t Event)
 					if (pgm_read_word(&CurrentMenuTable[0].MenuItemPntr) != 0)
 					{
 						CurrentMenuLevel--;
-						MenuDisplay((MENU_ITEM*)pgm_read_word(&CurrentMenuTable[0].MenuItemPntr), MenuLevels[CurrentMenuLevel]);
+						SubMenuTable = (MENU_ITEM*)pgm_read_word(&CurrentMenuTable[0].MenuItemPntr);
+						MenuDisplay(SubMenuTable, MenuLevels[CurrentMenuLevel]);
 					}					
 					break;
 			}
