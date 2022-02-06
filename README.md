@@ -12,7 +12,7 @@ The controller has a USB port to allow for firmware updates and monitoring/graph
 
 ![Front Panel](https://raw.githubusercontent.com/Makin-Things/Reflow_Oven_USB/master/Reflow%20Oven%20USB/Doc/Schematic%20Front%20Panel.png)
 
-## PCB Layout
+## PCB Layouts
 
 ![MCU Board](https://raw.githubusercontent.com/Makin-Things/Reflow_Oven_USB/master/Reflow%20Oven%20USB/Doc/PCB%20MCU%20Board.png)
 
